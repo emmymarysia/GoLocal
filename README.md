@@ -48,25 +48,25 @@ This app aims to connect people with local businesses and experiences. With the 
 ### 2. Screen Archetypes 
 
 - **Login/Register**
-- Register new user
-- Login
+  - Register new user
+  - Login
 - **Map view**
-- Explore/search map
-- Overlay to display icons
-- Filter the map based on specific products
+  - Explore/search map
+  - Overlay to display icons
+  - Filter the map based on specific products
 - **Stream**
-- List of user-created guides for specific interests/locations
+  - List of user-created guides for specific interests/locations
 - **Profile**
-- Profile page
+  - Profile page
 - **Creation**
-- Page to create a guide
-- Create plans for a trip with friends
-- Users can post photos of places they visit using their phone camera
+  - Page to create a guide
+  - Create plans for a trip with friends
+  - Users can post photos of places they visit using their phone camera
 - **Detail**
-- View the attributes of a specific business
-- Complete view of a specific guide when clicked
+  - View the attributes of a specific business
+  - Complete view of a specific guide when clicked
 - **Calendar**
-- Events calendar
+  - Events calendar
 
 ### 3. Navigation
 
@@ -86,16 +86,16 @@ This app aims to connect people with local businesses and experiences. With the 
   - *Post photos when you visit*
   - Filter search
 - **Guides list**
-- Create a guide
-- Complete view of a specific guide when clicked
+  - Create a guide
+  - Complete view of a specific guide when clicked
 - **User profile**
-- Create a guide
-- Search for/add friends
-- *Create plans for a trip with friends*
-- *Post photos of a business you visited*
+  - Create a guide
+  - Search for/add friends
+  - *Create plans for a trip with friends*
+  - *Post photos of a business you visited*
 - ***Events Calendar***
-- *Detail view for an event (same as for a business)*
-- *Add an event to a trip plan*
+  - *Detail view for an event (same as for a business)*
+  - *Add an event to a trip plan*
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
