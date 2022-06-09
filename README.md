@@ -81,10 +81,10 @@ This app aims to connect people with local businesses and experiences. With the 
 *italics indicates optional feature page*
 
 - **Map View**
-- Detail view of a specific business
-- *Add a business to a trip plan*
-- *Post photos when you visit*
-- Filter search
+  - Detail view of a specific business
+  - *Add a business to a trip plan*
+  - *Post photos when you visit*
+  - Filter search
 - **Guides list**
 - Create a guide
 - Complete view of a specific guide when clicked
