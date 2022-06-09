@@ -28,14 +28,14 @@ This app aims to connect people with local businesses and experiences. With the 
 
 **Required Must-have Stories**
 
--Register new user
--Login
--Explore/search map
--List of user-created guides for specific interests/locations
--Profile page users can customize with their interests, and that will display guides they’ve created
--Page to create a guide (title it, add locations and descriptions)
--View the attributes of a specific business
--Complete view of a specific guide when clicked
+- Register new user
+- Login
+- Explore/search map
+- List of user-created guides for specific interests/locations
+- Profile page users can customize with their interests, and that will display guides they’ve created
+- Page to create a guide (title it, add locations and descriptions)
+- View the attributes of a specific business
+- Complete view of a specific guide when clicked
 
 **Optional Nice-to-have Stories**
 
