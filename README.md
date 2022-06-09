@@ -28,45 +28,45 @@ This app aims to connect people with local businesses and experiences. With the 
 
 **Required Must-have Stories**
 
-Register new user
-Login
-Explore/search map
-List of user-created guides for specific interests/locations
-Profile page users can customize with their interests, and that will display guides they’ve created
-Page to create a guide (title it, add locations and descriptions)
-View the attributes of a specific business
-Complete view of a specific guide when clicked
+-Register new user
+-Login
+-Explore/search map
+-List of user-created guides for specific interests/locations
+-Profile page users can customize with their interests, and that will display guides they’ve created
+-Page to create a guide (title it, add locations and descriptions)
+-View the attributes of a specific business
+-Complete view of a specific guide when clicked
 
 **Optional Nice-to-have Stories**
 
-Add overlay to map to display icons specific to type of location (food, hike, clothes, etc.)
-Be able to filter/search the map based on a specific product you’re looking to buy and attributes of a business (eco friendly, etc.)
-Create plans for a trip/day out that you can add friends on the app to
-Users can post photos of places they visit using their phone camera
-Create an events calendar, and add events (like farmers markets or concerts) to the map
+-Add overlay to map to display icons specific to type of location (food, hike, clothes, etc.)
+-Be able to filter/search the map based on a specific product you’re looking to buy and attributes of a business (eco friendly, etc.)
+-Create plans for a trip/day out that you can add friends on the app to
+-Users can post photos of places they visit using their phone camera
+-Create an events calendar, and add events (like farmers markets or concerts) to the map
 
 ### 2. Screen Archetypes 
 
-Login/Register
-Register new user
-Login
-Map view
-Explore/search map
-Overlay to display icons
-Filter the map based on specific products
-Stream
-List of user-created guides for specific interests/locations
-Profile
-Profile page
-Creation
-Page to create a guide
-Create plans for a trip with friends
-Users can post photos of places they visit using their phone camera
-Detail
-View the attributes of a specific business
-Complete view of a specific guide when clicked
-Calendar
-Events calendar
+-**Login/Register**
+-Register new user
+-Login
+-**Map view**
+-Explore/search map
+-Overlay to display icons
+-Filter the map based on specific products
+-**Stream**
+-List of user-created guides for specific interests/locations
+-**Profile**
+-Profile page
+-**Creation**
+-Page to create a guide
+-Create plans for a trip with friends
+-Users can post photos of places they visit using their phone camera
+-**Detail**
+-View the attributes of a specific business
+-Complete view of a specific guide when clicked
+-**Calendar**
+-Events calendar
 
 ### 3. Navigation
 
@@ -78,24 +78,24 @@ Events calendar
 * (optional) Events Calendar
 
 **Flow Navigation** (Screen to Screen)
-*italics indicates optional feature page
+*italics indicates optional feature page*
 
-*Map View
-Detail view of a specific business
-Add a business to a trip plan
-Post photos when you visit
-Filter search
-*Guides list
-Create a guide
-Complete view of a specific guide when clicked
-*User profile
-Create a guide
-Search for/add friends
-Create plans for a trip with friends
-Post photos of a business you visited
-*Events Calendar 
-Detail view for an event (same as for a business)
-Add an event to a trip plan
+-**Map View**
+-Detail view of a specific business
+-*Add a business to a trip plan*
+-*Post photos when you visit*
+-Filter search
+-**Guides list**
+-Create a guide
+-Complete view of a specific guide when clicked
+-**User profile**
+-Create a guide
+-Search for/add friends
+-*Create plans for a trip with friends*
+-*Post photos of a business you visited*
+-***Events Calendar***
+-*Detail view for an event (same as for a business)*
+-*Add an event to a trip plan*
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
