@@ -99,7 +99,8 @@ This app aims to connect people with local businesses and experiences. With the 
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
+<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>[Scanned Documents.pdf](https://github.com/emmymarysia/GoLocal/files/8902912/Scanned.Documents.pdf)
+
 
 ### [BONUS] Digital Wireframes & Mockups
 
