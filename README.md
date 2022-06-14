@@ -99,7 +99,8 @@ This app aims to connect people with local businesses and experiences. With the 
 
 ## Wireframes
 [Add picture of your hand sketched wireframes in this section]
-<img src="[https://github.com/emmymarysia/GoLocal/files/8902912/Scanned.Documents.pdf](https://user-images.githubusercontent.com/26172675/173663885-36881218-db65-42d1-bf02-e9b3c02ad17e.png)" width=600>![Scanned Documents](https://user-images.githubusercontent.com/26172675/173663885-36881218-db65-42d1-bf02-e9b3c02ad17e.png)
+<img src="https://user-images.githubusercontent.com/26172675/173665445-1a5af2f3-2978-435b-b2fd-4fc5f4dcd9bf.png" width=600>![Scanned Documents](https://user-images.githubusercontent.com/26172675/173663885-36881218-db65-42d1-bf02-e9b3c02ad17e.png)
+![IMG_4717](https://user-images.githubusercontent.com/26172675/173665445-1a5af2f3-2978-435b-b2fd-4fc5f4dcd9bf.png)
 
 
 
