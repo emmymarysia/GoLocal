@@ -145,3 +145,8 @@ Business
 - [Create basic snippets for each Parse network request]
 - [OPTIONAL: List endpoints if using existing API such as Yelp]
 
+- place search (places/search)
+- get place details (places/{fsq_id})
+- get place photos (places/{fsq_id}/photos)
+- autocomplete (autocomplete)
+
