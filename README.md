@@ -110,9 +110,38 @@ This app aims to connect people with local businesses and experiences. With the 
 ## Schema 
 [This section will be completed in Unit 9]
 ### Models
-[Add table of models]
+User
+| Property | Type | Description |
+|----------|------|-------------|
+| username | String | the user's username |
+| friends | Array of Users | an array of the other users the given user has added as friends |
+| bio | String | the bio/description a user has written for their profile |
+| publishedGuides | Array of Guides | an array of the guides the user has published |
+| likedGuides | Array of Guides | an array of the guides a user has liked/saved |
+
+Guide
+| Property | Type | Description |
+|----------|------|-------------|
+| title | String | the title of the guide |
+| author | Pointer to a user | the user who has created the guide |
+| likedBy | Array of users | a list of the users who have liked this guide |
+| businessList | Array of businesses | a list of the businesses a user has added to this guide |
+
+Business
+| Property | Type | Description |
+|----------|------|-------------|
+| name | String | the name of the business |
+| address | String | the address of the business |
+| description | String | the description of the business a user has chosen to write for a guide |
+| image | File | the image a user has chosen to attach to this business |
+
+
 ### Networking
-- [Add list of network requests by screen ]
+- **Map view**
+  - autocomplete request from Foursquare as a user types in a search
+  - request from Foursquare to return list of businesses matching a search/filters
+  - request from Google Maps to display a map and display pins to businesses returned by Foursquare request
+- 
 - [Create basic snippets for each Parse network request]
 - [OPTIONAL: List endpoints if using existing API such as Yelp]
 
