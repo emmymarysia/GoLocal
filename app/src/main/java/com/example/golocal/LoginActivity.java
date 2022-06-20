@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +36,9 @@ public class LoginActivity extends AppCompatActivity {
         etPasswordLogin = findViewById(R.id.etPasswordLogin);
         btLogin = findViewById(R.id.btLogin);
         tvSignup = findViewById(R.id.tvSignup);
+
+        String signupText = "<u>" + tvSignup.getText() + "</u>";
+        tvSignup.setText(Html.fromHtml(signupText));
 
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
