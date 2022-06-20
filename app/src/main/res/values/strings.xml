@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">GoLocal</string>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">E9AG7GyHCR7Avg2gg31nbWPhm2DDlCTJuNOoT46a</string>
+    <string name="back4app_client_key">3Z3sR6qwiAAZeuy3G9KPtuKF2n6Wk4McGhkMKAOK</string>
 </resources>
