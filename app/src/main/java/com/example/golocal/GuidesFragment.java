@@ -57,7 +57,7 @@ public class GuidesFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.compose) {
-            Fragment fragment = new CreateGuideFragment();
+            Fragment fragment = new CreateGuideFragment(mainActivity);
             mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             return true;
         }
@@ -79,7 +79,7 @@ public class GuidesFragment extends Fragment {
     }
 
     // TODO: change this so that it doesn't just show all guides
-    private void queryGuides() {
+    public void queryGuides() {
         ParseQuery<Guide> query = ParseQuery.getQuery(Guide.class);
         query.include(Guide.KEY_AUTHOR);
         query.findInBackground(new FindCallback<Guide>() {
