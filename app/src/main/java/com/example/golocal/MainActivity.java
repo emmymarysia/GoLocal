@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_guides:
-                        fragment = (Fragment) guidesFragment;
+                        Log.i("Main", "guides clicked");
+                        fragment = guidesFragment;
                         break;
                     case R.id.action_profile:
                         fragment = profileFragment;

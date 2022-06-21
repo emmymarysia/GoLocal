@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,12 +39,28 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         return guides.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private TextView tvTitle;
+        private TextView tvAuthor;
+        private TextView tvDescription;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvAuthor = itemView.findViewById(R.id.tvAuthor);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Guide guide) {
+            tvTitle.setText(guide.getTitle());
+            tvAuthor.setText(guide.getAuthor().getUsername());
+            tvDescription.setText(guide.getDescription());
+        }
+
+        @Override
+        public void onClick(View v) {
+            // TODO: implement going to guide detail activity
         }
     }
 }

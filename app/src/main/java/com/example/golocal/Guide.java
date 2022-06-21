@@ -1,15 +1,18 @@
 package com.example.golocal;
 
+import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.List;
 
+@ParseClassName("Guide")
 public class Guide extends ParseObject {
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_TITLE = "title";
     public static final String KEY_LIKEDBY = "likedBy";
     public static final String KEY_BUSINESSLIST = "businessList";
+    public static final String KEY_DESCRIPTION = "description";
 
     public ParseUser getAuthor() {
         return getParseUser(KEY_AUTHOR);
@@ -41,5 +44,13 @@ public class Guide extends ParseObject {
 
     public void setBusinessList(List<Business> businessList) {
         put(KEY_BUSINESSLIST, businessList);
+    }
+
+    public String getDescription() {
+        return getString(KEY_DESCRIPTION);
+    }
+
+    public void setDescription(String description) {
+        put(KEY_DESCRIPTION, description);
     }
 }
