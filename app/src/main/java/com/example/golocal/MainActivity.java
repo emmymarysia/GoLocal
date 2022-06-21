@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         mapFragment = new MapFragment();
-        guidesFragment = new GuidesFragment();
+        guidesFragment = new GuidesFragment(this);
         profileFragment = new ProfileFragment();
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_guides:
-                        Log.i("Main", "guides clicked");
                         fragment = guidesFragment;
                         break;
                     case R.id.action_profile:

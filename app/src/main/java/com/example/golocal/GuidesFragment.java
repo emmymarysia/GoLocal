@@ -1,11 +1,13 @@
 package com.example.golocal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,8 +31,10 @@ public class GuidesFragment extends Fragment {
     GuidesAdapter adapter;
     Context context;
     private final String TAG = "GuidesFragment";
+    MainActivity mainActivity;
 
-    public GuidesFragment() {
+    public GuidesFragment(MainActivity main) {
+        mainActivity = main;
     }
 
     @Override
@@ -47,11 +51,18 @@ public class GuidesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        Log.i(TAG, "eh");
         inflater.inflate(R.menu.menu_guides, menu);
     }
 
-
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.compose) {
+            Fragment fragment = new CreateGuideFragment();
+            mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -63,7 +74,6 @@ public class GuidesFragment extends Fragment {
         adapter = new GuidesAdapter(context, guides);
         rvGuides.setAdapter(adapter);
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
-        Log.i(TAG, "hello!!!");
         queryGuides();
 
     }
@@ -79,7 +89,6 @@ public class GuidesFragment extends Fragment {
                     Log.e(TAG, "Issue getting posts", e);
                     return;
                 }
-                Log.i(TAG, "guidez");
                 guides.addAll(guidesList);
                 Collections.reverse(guides);
                 adapter.notifyDataSetChanged();
