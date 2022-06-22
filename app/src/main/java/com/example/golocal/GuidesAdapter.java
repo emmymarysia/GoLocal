@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.parceler.Parcels;
@@ -71,12 +72,13 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
 
         @Override
         public void onClick(View v) {
-            // TODO: implement going to guide detail activity
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 Guide guide = guides.get(position);
                 Fragment fragment = new GuideDetailFragment(guide);
-                mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         }
     }

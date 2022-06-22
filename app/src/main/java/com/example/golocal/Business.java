@@ -1,6 +1,9 @@
 package com.example.golocal;
 
+import android.util.Log;
+
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
@@ -10,9 +13,15 @@ public class Business extends ParseObject {
     public static final String KEY_IMAGE = "image";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_DESCRIPTION = "description";
+    private final String TAG = "Business";
 
     public String getName() {
-        return getString(KEY_NAME);
+        try {
+            return fetchIfNeeded().getString("name");
+        } catch (ParseException e) {
+            Log.e(TAG, "Couldn't get name", e);
+        }
+        return "";
     }
 
     public void setName(String name) {

@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GuideDetailFragment extends Fragment {
@@ -18,6 +19,7 @@ public class GuideDetailFragment extends Fragment {
     private TextView tvAuthorDetail;
     private TextView tvDescriptionDetail;
     private RecyclerView rvBusinessesDetail;
+    private BusinessAdapter adapter;
 
     public GuideDetailFragment(Guide guide) {
         this.guide = guide;
@@ -37,9 +39,12 @@ public class GuideDetailFragment extends Fragment {
         tvAuthorDetail = view.findViewById(R.id.tvAuthorDetail);
         tvDescriptionDetail = view.findViewById(R.id.tvDescriptionDetail);
         rvBusinessesDetail = view.findViewById(R.id.rvBusinessesDetail);
+        adapter = new BusinessAdapter(getContext(), guide.getBusinessList());
 
         tvTitleDetail.setText(guide.getTitle());
         tvAuthorDetail.setText(guide.getAuthor().getUsername());
         tvDescriptionDetail.setText(guide.getDescription());
+        rvBusinessesDetail.setAdapter(adapter);
+        rvBusinessesDetail.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 }
