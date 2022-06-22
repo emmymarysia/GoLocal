@@ -71,7 +71,7 @@ public class GuidesFragment extends Fragment {
         rvGuides = view.findViewById(R.id.rvGuides);
         guides = new ArrayList<>();
         context = getContext();
-        adapter = new GuidesAdapter(context, guides);
+        adapter = new GuidesAdapter(context, guides, mainActivity);
         rvGuides.setAdapter(adapter);
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
         queryGuides();

@@ -1,13 +1,17 @@
 package com.example.golocal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.parceler.Parcels;
 
 import java.util.List;
 
@@ -15,10 +19,12 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
 
     private Context context;
     private List<Guide> guides;
+    private MainActivity mainActivity;
 
-    public GuidesAdapter(Context context, List<Guide> guides) {
+    public GuidesAdapter(Context context, List<Guide> guides, MainActivity main) {
         this.context = context;
         this.guides = guides;
+        mainActivity = main;
     }
 
     @NonNull
@@ -66,6 +72,12 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         @Override
         public void onClick(View v) {
             // TODO: implement going to guide detail activity
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
+                Guide guide = guides.get(position);
+                Fragment fragment = new GuideDetailFragment(guide);
+                mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+            }
         }
     }
 }

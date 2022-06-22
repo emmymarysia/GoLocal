@@ -4,8 +4,11 @@ import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
+//@Parcel
 @ParseClassName("Guide")
 public class Guide extends ParseObject {
     public static final String KEY_AUTHOR = "author";
@@ -13,6 +16,8 @@ public class Guide extends ParseObject {
     public static final String KEY_LIKEDBY = "likedBy";
     public static final String KEY_BUSINESSLIST = "businessList";
     public static final String KEY_DESCRIPTION = "description";
+
+    public Guide() {}
 
     public ParseUser getAuthor() {
         return getParseUser(KEY_AUTHOR);
