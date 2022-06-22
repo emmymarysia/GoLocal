@@ -31,9 +31,9 @@ public class MainActivity extends AppCompatActivity {
         currentUser = ParseUser.getCurrentUser();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        mapFragment = new MapFragment();
+        mapFragment = new MapFragment(this);
         guidesFragment = new GuidesFragment(this);
-        profileFragment = new ProfileFragment();
+        profileFragment = new ProfileFragment(ParseUser.getCurrentUser());
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
