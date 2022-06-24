@@ -1,4 +1,4 @@
-package com.example.golocal;
+package com.example.golocal.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,17 +12,21 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.golocal.R;
+import com.example.golocal.adapters.BusinessAdapter;
+import com.example.golocal.models.GuideDataModel;
+
 public class GuideDetailFragment extends Fragment {
 
-    private Guide guide;
+    private GuideDataModel guideDataModel;
     private TextView tvTitleDetail;
     private TextView tvAuthorDetail;
     private TextView tvDescriptionDetail;
     private RecyclerView rvBusinessesDetail;
     private BusinessAdapter adapter;
 
-    public GuideDetailFragment(Guide guide) {
-        this.guide = guide;
+    public GuideDetailFragment(GuideDataModel guideDataModel) {
+        this.guideDataModel = guideDataModel;
     }
 
     @Nullable
@@ -39,11 +43,11 @@ public class GuideDetailFragment extends Fragment {
         tvAuthorDetail = view.findViewById(R.id.tvAuthorDetail);
         tvDescriptionDetail = view.findViewById(R.id.tvDescriptionDetail);
         rvBusinessesDetail = view.findViewById(R.id.rvBusinessesDetail);
-        adapter = new BusinessAdapter(getContext(), guide.getBusinessList());
+        adapter = new BusinessAdapter(getContext(), guideDataModel.getBusinessList());
 
-        tvTitleDetail.setText(guide.getTitle());
-        tvAuthorDetail.setText(guide.getAuthor().getUsername());
-        tvDescriptionDetail.setText(guide.getDescription());
+        tvTitleDetail.setText(guideDataModel.getTitle());
+        tvAuthorDetail.setText(guideDataModel.getAuthor().getUsername());
+        tvDescriptionDetail.setText(guideDataModel.getDescription());
         rvBusinessesDetail.setAdapter(adapter);
         rvBusinessesDetail.setLayoutManager(new LinearLayoutManager(getContext()));
     }

@@ -1,4 +1,4 @@
-package com.example.golocal;
+package com.example.golocal.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,16 +9,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.golocal.R;
+import com.example.golocal.models.BusinessDataModel;
+
 import java.util.List;
 
 public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.ViewHolder> {
 
     private Context context;
-    private List<Business> businessList;
+    private List<BusinessDataModel> businessDataModelList;
 
-    public BusinessAdapter(Context context, List<Business> businesses) {
+    public BusinessAdapter(Context context, List<BusinessDataModel> businessDataModels) {
         this.context = context;
-        businessList = businesses;
+        businessDataModelList = businessDataModels;
     }
 
     @NonNull
@@ -30,23 +33,23 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull BusinessAdapter.ViewHolder holder, int position) {
-        Business business = businessList.get(position);
-        holder.bind(business);
+        BusinessDataModel businessDataModel = businessDataModelList.get(position);
+        holder.bind(businessDataModel);
     }
 
     public void clear() {
-        businessList.clear();
+        businessDataModelList.clear();
         notifyDataSetChanged();
     }
 
-    public void addAll(List<Business> businesses) {
-        businessList.addAll(businesses);
+    public void addAll(List<BusinessDataModel> businessDataModels) {
+        businessDataModelList.addAll(businessDataModels);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return businessList.size();
+        return businessDataModelList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -59,9 +62,9 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.ViewHo
             tvDescriptionList = itemView.findViewById(R.id.tvDescriptionList);
         }
 
-        public void bind(Business business) {
-            tvTitleList.setText(business.getName());
-            tvDescriptionList.setText(business.getDescription());
+        public void bind(BusinessDataModel businessDataModel) {
+            tvTitleList.setText(businessDataModel.getName());
+            tvDescriptionList.setText(businessDataModel.getDescription());
         }
     }
 }
