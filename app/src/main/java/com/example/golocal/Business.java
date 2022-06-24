@@ -1,4 +1,4 @@
-package com.example.golocal.models;
+package com.example.golocal;
 
 import android.util.Log;
 
@@ -8,12 +8,12 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 @ParseClassName("Business")
-public class BusinessDataModel extends ParseObject {
+public class Business extends ParseObject {
     public static final String KEY_NAME = "name";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_DESCRIPTION = "description";
-    private final String TAG = "BusinessDataModel";
+    private final String TAG = "Business";
 
     public String getName() {
         try {

@@ -1,4 +1,4 @@
-package com.example.golocal.fragments;
+package com.example.golocal;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -7,18 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.golocal.R;
-import com.example.golocal.activities.MainActivity;
-import com.example.golocal.adapters.BusinessAdapter;
-import com.example.golocal.models.BusinessDataModel;
-import com.example.golocal.models.GuideDataModel;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -35,10 +32,10 @@ public class CreateGuideFragment extends Fragment {
     private EditText etName;
     private EditText etBusinessDescription;
     private Button btAdd;
-    private GuideDataModel guideDataModel;
-    private List<BusinessDataModel> businessDataModelList;
-    private MainActivity mainActivity;
-    private BusinessAdapter adapter;
+    Guide guide;
+    List<Business> businessList;
+    MainActivity mainActivity;
+    BusinessAdapter adapter;
     private final String TAG = "CreateGuideFragment";
 
     public CreateGuideFragment(MainActivity main) {
@@ -55,8 +52,8 @@ public class CreateGuideFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        guideDataModel = new GuideDataModel();
-        businessDataModelList = new ArrayList<>();
+        guide = new Guide();
+        businessList = new ArrayList<>();
         etTitle = view.findViewById(R.id.etTitle);
         etDescription = view.findViewById(R.id.etDescription);
         rvBusinesses = view.findViewById(R.id.rvBusinesses);
@@ -66,7 +63,7 @@ public class CreateGuideFragment extends Fragment {
         etBusinessDescription = view.findViewById(R.id.etBusinessDescription);
         btAdd = view.findViewById(R.id.btAdd);
 
-        adapter = new BusinessAdapter(getContext(), businessDataModelList);
+        adapter = new BusinessAdapter(getContext(), businessList);
         rvBusinesses.setAdapter(adapter);
         rvBusinesses.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -81,11 +78,11 @@ public class CreateGuideFragment extends Fragment {
                     public void onClick(View v) {
                         String name = etName.getText().toString();
                         String description = etBusinessDescription.getText().toString();
-                        BusinessDataModel businessDataModel = new BusinessDataModel();
-                        businessDataModel.setName(name);
-                        businessDataModel.setDescription(description);
-                        businessDataModelList.add(businessDataModel);
-                        businessDataModel.saveInBackground(new SaveCallback() {
+                        Business business = new Business();
+                        business.setName(name);
+                        business.setDescription(description);
+                        businessList.add(business);
+                        business.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(ParseException e) {
                                 if (e != null) {
@@ -107,11 +104,11 @@ public class CreateGuideFragment extends Fragment {
         btFinishCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                guideDataModel.setTitle(etTitle.getText().toString());
-                guideDataModel.setDescription(etDescription.getText().toString());
-                guideDataModel.setAuthor(ParseUser.getCurrentUser());
-                guideDataModel.setBusinessList(businessDataModelList);
-                guideDataModel.saveInBackground(new SaveCallback() {
+                guide.setTitle(etTitle.getText().toString());
+                guide.setDescription(etDescription.getText().toString());
+                guide.setAuthor(ParseUser.getCurrentUser());
+                guide.setBusinessList(businessList);
+                guide.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
@@ -120,6 +117,7 @@ public class CreateGuideFragment extends Fragment {
                         etTitle.setText("");
                         etDescription.setText("");
                         mainActivity.guidesFragment.adapter.clear();
+                        //mainActivity.guidesFragment.queryGuides();
                     }
                 });
 

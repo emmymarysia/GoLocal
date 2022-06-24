@@ -1,6 +1,7 @@
-package com.example.golocal.fragments;
+package com.example.golocal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,11 +17,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.golocal.R;
-import com.example.golocal.activities.MainActivity;
-import com.example.golocal.adapters.GuidesAdapter;
-import com.example.golocal.fragments.CreateGuideFragment;
-import com.example.golocal.models.GuideDataModel;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -31,11 +27,11 @@ import java.util.List;
 
 public class GuidesFragment extends Fragment {
     private RecyclerView rvGuides;
-    private List<GuideDataModel> guideDataModels;
-    public GuidesAdapter adapter;
-    private Context context;
+    List<Guide> guides;
+    GuidesAdapter adapter;
+    Context context;
     private final String TAG = "GuidesFragment";
-    private MainActivity mainActivity;
+    MainActivity mainActivity;
 
     public GuidesFragment(MainActivity main) {
         mainActivity = main;
@@ -73,27 +69,28 @@ public class GuidesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         rvGuides = view.findViewById(R.id.rvGuides);
-        guideDataModels = new ArrayList<>();
+        guides = new ArrayList<>();
         context = getContext();
-        adapter = new GuidesAdapter(context, guideDataModels, mainActivity);
+        adapter = new GuidesAdapter(context, guides, mainActivity);
         rvGuides.setAdapter(adapter);
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
         queryGuides();
+
     }
 
     // TODO: change this so that it doesn't just show all guides
     public void queryGuides() {
-        ParseQuery<GuideDataModel> query = ParseQuery.getQuery(GuideDataModel.class);
-        query.include(GuideDataModel.KEY_AUTHOR);
-        query.findInBackground(new FindCallback<GuideDataModel>() {
+        ParseQuery<Guide> query = ParseQuery.getQuery(Guide.class);
+        query.include(Guide.KEY_AUTHOR);
+        query.findInBackground(new FindCallback<Guide>() {
             @Override
-            public void done(List<GuideDataModel> guidesList, ParseException e) {
+            public void done(List<Guide> guidesList, ParseException e) {
                 if (e != null) {
                     Log.e(TAG, "Issue getting posts", e);
                     return;
                 }
-                guideDataModels.addAll(guidesList);
-                Collections.reverse(guideDataModels);
+                guides.addAll(guidesList);
+                Collections.reverse(guides);
                 adapter.notifyDataSetChanged();
             }
         });
