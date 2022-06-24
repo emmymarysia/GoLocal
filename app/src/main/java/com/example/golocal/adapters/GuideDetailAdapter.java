@@ -1,4 +1,4 @@
-package com.example.golocal;
+package com.example.golocal.adapters;
 
 import android.view.View;
 import android.view.ViewGroup;

@@ -1,23 +1,21 @@
-package com.example.golocal;
+package com.example.golocal.models;
 
+import com.example.golocal.models.BusinessDataModel;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import org.parceler.Parcel;
-
 import java.util.List;
 
-//@Parcel
 @ParseClassName("Guide")
-public class Guide extends ParseObject {
+public class GuideDataModel extends ParseObject {
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_TITLE = "title";
     public static final String KEY_LIKEDBY = "likedBy";
     public static final String KEY_BUSINESSLIST = "businessList";
     public static final String KEY_DESCRIPTION = "description";
 
-    public Guide() {}
+    public GuideDataModel() {}
 
     public ParseUser getAuthor() {
         return getParseUser(KEY_AUTHOR);
@@ -43,12 +41,12 @@ public class Guide extends ParseObject {
         put(KEY_LIKEDBY, likedBy);
     }
 
-    public List<Business> getBusinessList() {
+    public List<BusinessDataModel> getBusinessList() {
         return getList(KEY_BUSINESSLIST);
     }
 
-    public void setBusinessList(List<Business> businessList) {
-        put(KEY_BUSINESSLIST, businessList);
+    public void setBusinessList(List<BusinessDataModel> businessDataModelList) {
+        put(KEY_BUSINESSLIST, businessDataModelList);
     }
 
     public String getDescription() {

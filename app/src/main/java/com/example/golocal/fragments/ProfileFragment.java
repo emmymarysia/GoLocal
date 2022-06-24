@@ -1,4 +1,4 @@
-package com.example.golocal;
+package com.example.golocal.fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +20,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.golocal.R;
+import com.example.golocal.activities.LoginActivity;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 public class ProfileFragment extends Fragment {
     private TextView tvUsername;
@@ -33,7 +37,8 @@ public class ProfileFragment extends Fragment {
     private ParseUser user;
     private final String KEY_BIO = "bio";
     private final String KEY_IMAGE = "profileImage";
-    Context context;
+    private Context context;
+    private final String TAG = "ProfileFragment";
 
     public ProfileFragment(ParseUser currentUser) {
         user = currentUser;
@@ -103,6 +108,14 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         user.put(KEY_BIO, etBio.getText().toString());
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e != null) {
+                                    Log.e(TAG, "error updating bio", e);
+                                }
+                            }
+                        });
                         tvBio.setText(user.getString(KEY_BIO));
                         tvBio.setVisibility(View.VISIBLE);
                         etBio.setVisibility(View.GONE);

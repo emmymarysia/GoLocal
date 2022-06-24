@@ -1,7 +1,6 @@
-package com.example.golocal;
+package com.example.golocal.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +11,22 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.parceler.Parcels;
+import com.example.golocal.fragments.GuideDetailFragment;
+import com.example.golocal.activities.MainActivity;
+import com.example.golocal.R;
+import com.example.golocal.models.GuideDataModel;
 
 import java.util.List;
 
 public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder> {
 
     private Context context;
-    private List<Guide> guides;
+    private List<GuideDataModel> guideDataModels;
     private MainActivity mainActivity;
 
-    public GuidesAdapter(Context context, List<Guide> guides, MainActivity main) {
+    public GuidesAdapter(Context context, List<GuideDataModel> guideDataModels, MainActivity main) {
         this.context = context;
-        this.guides = guides;
+        this.guideDataModels = guideDataModels;
         mainActivity = main;
     }
 
@@ -37,17 +39,17 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull GuidesAdapter.ViewHolder holder, int position) {
-        Guide guide = guides.get(position);
-        holder.bind(guide);
+        GuideDataModel guideDataModel = guideDataModels.get(position);
+        holder.bind(guideDataModel);
     }
 
     @Override
     public int getItemCount() {
-        return guides.size();
+        return guideDataModels.size();
     }
 
     public void clear() {
-        guides.clear();
+        guideDataModels.clear();
         notifyDataSetChanged();
     }
 
@@ -64,18 +66,18 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             itemView.setOnClickListener(this);
         }
 
-        public void bind(Guide guide) {
-            tvTitle.setText(guide.getTitle());
-            tvAuthor.setText(guide.getAuthor().getUsername());
-            tvDescription.setText(guide.getDescription());
+        public void bind(GuideDataModel guideDataModel) {
+            tvTitle.setText(guideDataModel.getTitle());
+            tvAuthor.setText(guideDataModel.getAuthor().getUsername());
+            tvDescription.setText(guideDataModel.getDescription());
         }
 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                Guide guide = guides.get(position);
-                Fragment fragment = new GuideDetailFragment(guide);
+                GuideDataModel guideDataModel = guideDataModels.get(position);
+                Fragment fragment = new GuideDetailFragment(guideDataModel);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
