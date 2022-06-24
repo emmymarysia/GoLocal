@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -38,7 +40,9 @@ import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
     private TextView tvUsername;
@@ -48,12 +52,14 @@ public class ProfileFragment extends Fragment {
     private EditText etBio;
     private Button btFinishEditBio;
     private ImageButton ibEditProfileImage;
+    private Button btChooseFromGallery;
     private ParseUser user;
     private final String KEY_BIO = "bio";
     private final String KEY_IMAGE = "profileImage";
     private Context context;
     private final String TAG = "ProfileFragment";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    public final static int PICK_PHOTO_CODE = 1046;
     private File photoFile;
     public String photoFileName = "photo.jpg";
 
@@ -106,6 +112,7 @@ public class ProfileFragment extends Fragment {
         etBio = view.findViewById(R.id.etBio);
         btFinishEditBio = view.findViewById(R.id.btFinishEditBio);
         ibEditProfileImage = view.findViewById(R.id.ibEditProfileImage);
+        btChooseFromGallery = view.findViewById(R.id.btChooseFromGallery);
 
         tvUsername.setText(user.getString("username"));
         tvBio.setText(user.getString("bio"));
@@ -119,6 +126,13 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 launchCamera();
+            }
+        });
+
+        btChooseFromGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onPickPhoto(v);
             }
         });
 
@@ -181,27 +195,67 @@ public class ProfileFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-
                 Bitmap resizedBitmap = Bitmap.createScaledBitmap(takenImage, 100, 100, true);
-                ivProfileImage.setImageBitmap(resizedBitmap);
-                user.put(KEY_IMAGE, new ParseFile(photoFile));
-                user.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.e(TAG, "Error while saving profile image", e);
-                            Toast.makeText(context, "Error while saving profile image", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                Glide.with(this)
-                        .load(user.getParseFile(KEY_IMAGE).getUrl())
-                        .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .circleCrop()
-                        .into(ivProfileImage);
+                saveAndShowImage(resizedBitmap);
             } else {
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
+        } else if (requestCode == PICK_PHOTO_CODE && (data != null)) {
+            Uri photoUri = data.getData();
+            Bitmap selectedImage = loadFromUri(photoUri);
+            saveAndShowImage(selectedImage);
+        }
+    }
+
+    private void saveAndShowImage(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] bitmapBytes = stream.toByteArray();
+        user.put(KEY_IMAGE, new ParseFile(bitmapBytes));
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error while saving profile image", e);
+                    Toast.makeText(context, "Error while saving profile image", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        Glide.with(this)
+                .load(user.getParseFile(KEY_IMAGE).getUrl())
+                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                .circleCrop()
+                .into(ivProfileImage);
+    }
+
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if(Build.VERSION.SDK_INT > 27){
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(context.getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public void onPickPhoto(View view) {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
         }
     }
 }
