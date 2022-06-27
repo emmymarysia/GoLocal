@@ -3,14 +3,21 @@ package com.example.golocal.fragments;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.golocal.R;
@@ -22,6 +29,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 
 public class MapFragment extends Fragment {
 
@@ -30,6 +44,9 @@ public class MapFragment extends Fragment {
     private Location mCurrentLocation;
     private MainActivity mainActivity;
     private final static int CAMERA_ZOOM = 17;
+    private final static String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+    private OkHttpClient client = new OkHttpClient();
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -39,6 +56,33 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_map, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // perform query here
+
+                searchView.clearFocus();
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() >= 3) {
+                    AutocompleteCall call = new AutocompleteCall();
+                    call.execute(newText);
+                }
+                return false;
+            }
+        });
     }
 
     @Nullable
@@ -89,6 +133,36 @@ public class MapFragment extends Fragment {
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, CAMERA_ZOOM);
             map.animateCamera(cameraUpdate);
+        }
+    }
+
+    private class AutocompleteCall extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            Double latitude = mCurrentLocation.getLatitude();
+            Double longitude = mCurrentLocation.getLongitude();
+            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
+            Request request = new Request.Builder()
+                    .url(AUTOCOMPLETE_URL + params[0] + "&ll=" + latlng)
+                    .get()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
+                    .build();
+
+
+            Response response;
+            String resp;
+            try {
+                response = client.newCall(request).execute();
+                resp = response.body().string();
+                Log.i("MapFragment", resp);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return resp;
         }
     }
 }
