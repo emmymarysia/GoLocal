@@ -29,6 +29,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.text.DecimalFormat;
 
@@ -45,6 +49,7 @@ public class MapFragment extends Fragment {
     private MainActivity mainActivity;
     private final static int CAMERA_ZOOM = 17;
     private final static String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+    private final static String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private OkHttpClient client = new OkHttpClient();
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -67,7 +72,8 @@ public class MapFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // perform query here
+                SearchQueryCall call = new SearchQueryCall();
+                call.execute(query);
 
                 searchView.clearFocus();
 
@@ -152,17 +158,57 @@ public class MapFragment extends Fragment {
 
 
             Response response;
-            String resp;
+            String results;
             try {
                 response = client.newCall(request).execute();
-                resp = response.body().string();
-                Log.i("MapFragment", resp);
+                results = response.body().string();
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
 
-            return resp;
+            return results;
+        }
+    }
+
+    private class SearchQueryCall extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            Double latitude = mCurrentLocation.getLatitude();
+            Double longitude = mCurrentLocation.getLongitude();
+            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
+            Request request = new Request.Builder()
+                    .url(SEARCH_URL + params[0] + "&ll=" + latlng + "&exclude_all_chains=true")
+                    .get()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
+                    .build();
+
+
+            Response response;
+            String results;
+            try {
+                response = client.newCall(request).execute();
+                results = response.body().string();
+                Log.i("MapFragment", results);
+                fromJson(results);
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return results;
+        }
+    }
+
+    private void fromJson(String data) throws JSONException {
+        JSONObject obj = new JSONObject(data);
+        JSONArray results = obj.getJSONArray("results");
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject business = results.getJSONObject(i);
+            String address = business.getJSONObject("location").getString("address");
+            Log.i("MapFragment", address);
         }
     }
 }
