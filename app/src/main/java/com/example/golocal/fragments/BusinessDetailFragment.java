@@ -106,8 +106,12 @@ public class BusinessDetailFragment extends Fragment {
 
     private void setFields(String data) throws JSONException {
         JSONObject queryResponse = new JSONObject(data);
-        String businessDescription = queryResponse.getString("description");
-        tvBusinessDescription.setText(businessDescription);
+        String businessDescription = queryResponse.optString("description");
+        if (businessDescription != null) {
+            tvBusinessDescription.setText(businessDescription);
+        } else {
+            tvBusinessDescription.setVisibility(View.GONE);
+        }
         JSONArray photos = queryResponse.getJSONArray("photos");
         if (photos.getJSONObject(0) != null) {
             JSONObject businessPhoto = photos.getJSONObject(0);
@@ -116,7 +120,6 @@ public class BusinessDetailFragment extends Fragment {
             String dimensions = Integer.valueOf(screenWidth) + "x" + Integer.valueOf(screenWidth);
             String imageUrl = prefix + dimensions + suffix;
             Glide.with(this).load(imageUrl).override(screenWidth, screenWidth).into(ivBusinessImage);
-            Log.i("DetailFragment", imageUrl);
         } else {
             ivBusinessImage.setVisibility(View.GONE);
         }
