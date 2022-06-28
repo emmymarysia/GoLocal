@@ -134,6 +134,16 @@ public class MapFragment extends Fragment {
         } else {
             Toast.makeText(mainActivity, "Map is null", Toast.LENGTH_SHORT).show();
         }
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String title = marker.getTitle();
+                String address = marker.getSnippet();
+                BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(title, address);
+                mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, businessDetailFragment).commit();
+                return false;
+            }
+        });
     }
 
 
