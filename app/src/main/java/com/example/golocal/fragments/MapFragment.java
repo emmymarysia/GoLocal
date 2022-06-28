@@ -57,7 +57,6 @@ public class MapFragment extends Fragment {
     private final static String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private OkHttpClient client = new OkHttpClient();
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    private ArrayList<LatLng> queryResultLocations = new ArrayList<>();
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -78,23 +77,9 @@ public class MapFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                BitmapDescriptor defaultMarker =
-                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
                 SearchQueryCall call = new SearchQueryCall();
                 call.execute(query);
-                /*
-                Log.i("MapFragment", String.valueOf(queryResultLocations.size()));
-                for (int i = 0; i < queryResultLocations.size(); i++) {
-                    Log.i("MapFragment", "hello");
-                    Marker mapMarker = map.addMarker(new MarkerOptions()
-                            .position(queryResultLocations.get(i))
-                            .title("name")
-                            .snippet("address")
-                            .icon(defaultMarker));
-                } */
-                // map.animateCamera(CameraUpdateFactory.newLatLngZoom(queryResultLocations.get(0), CAMERA_ZOOM));
                 searchView.clearFocus();
-
                 return true;
             }
 
@@ -173,7 +158,6 @@ public class MapFragment extends Fragment {
                     .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
                     .build();
 
-
             Response response;
             String results;
             try {
@@ -207,12 +191,10 @@ public class MapFragment extends Fragment {
             try {
                 response = client.newCall(request).execute();
                 results = response.body().string();
-                Log.i("MapFragment", results);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
-
             return results;
         }
 
@@ -226,27 +208,28 @@ public class MapFragment extends Fragment {
     }
 
     private void queryResultsFromJson(String data) throws JSONException {
-        BitmapDescriptor defaultMarker =
-                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
-        JSONObject obj = new JSONObject(data);
-        JSONArray results = obj.getJSONArray("results");
-        Log.i("MapFragment", "hello" + String.valueOf(results.length()));
+        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+        JSONObject queryResponse = new JSONObject(data);
+        LatLng mapCenter = null;
+        JSONArray results = queryResponse.getJSONArray("results");
         for (int i = 0; i < results.length(); i++) {
             JSONObject business = results.getJSONObject(i);
             String address = business.getJSONObject("location").getString("address");
-            Log.i("MapFragment", address);
             String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
             String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
             LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+            if (i == 0) {
+                mapCenter = markerPosition;
+            }
             String businessName = business.getString("name");
-            queryResultLocations.add(markerPosition);
-            Log.i("MapFragment", "size " + queryResultLocations.size());
             Marker mapMarker = map.addMarker(new MarkerOptions()
                     .position(markerPosition)
                     .title(businessName)
                     .snippet(address)
                     .icon(defaultMarker));
         }
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(queryResultLocations.get(0), CAMERA_ZOOM));
+        if (mapCenter != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
+        }
     }
 }
