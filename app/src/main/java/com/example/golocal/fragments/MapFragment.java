@@ -19,9 +19,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
+import com.example.golocal.models.BusinessDataModel;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +42,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -57,6 +60,7 @@ public class MapFragment extends Fragment {
     private final static String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private OkHttpClient client = new OkHttpClient();
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -80,6 +84,7 @@ public class MapFragment extends Fragment {
                 SearchQueryCall call = new SearchQueryCall();
                 call.execute(query);
                 searchView.clearFocus();
+                map.clear();
                 return true;
             }
 
@@ -139,8 +144,12 @@ public class MapFragment extends Fragment {
             public boolean onMarkerClick(Marker marker) {
                 String title = marker.getTitle();
                 String address = marker.getSnippet();
-                BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(title, address);
-                mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, businessDetailFragment).commit();
+                BusinessDataModel clickedBusiness = queryResultBusinesses.get(marker);
+                BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(clickedBusiness);
+                FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flContainer, businessDetailFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
                 return false;
             }
         });
@@ -222,6 +231,7 @@ public class MapFragment extends Fragment {
         JSONObject queryResponse = new JSONObject(data);
         LatLng mapCenter = null;
         JSONArray results = queryResponse.getJSONArray("results");
+        queryResultBusinesses.clear();
         for (int i = 0; i < results.length(); i++) {
             JSONObject business = results.getJSONObject(i);
             String address = business.getJSONObject("location").getString("address");
@@ -232,11 +242,15 @@ public class MapFragment extends Fragment {
                 mapCenter = markerPosition;
             }
             String businessName = business.getString("name");
+            BusinessDataModel currentBusiness = new BusinessDataModel();
+            currentBusiness.setName(businessName);
+            currentBusiness.setAddress(address);
             Marker mapMarker = map.addMarker(new MarkerOptions()
                     .position(markerPosition)
                     .title(businessName)
                     .snippet(address)
                     .icon(defaultMarker));
+            queryResultBusinesses.put(mapMarker, currentBusiness);
         }
         if (mapCenter != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));

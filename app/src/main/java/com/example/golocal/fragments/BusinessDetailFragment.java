@@ -11,17 +11,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.golocal.R;
+import com.example.golocal.models.BusinessDataModel;
 
 public class BusinessDetailFragment extends Fragment {
 
     private TextView tvBusinessTitle;
     private TextView tvBusinessAddress;
-    private String businessTitle;
-    private String businessAddress;
+    private BusinessDataModel businessDataModel;
 
-    public BusinessDetailFragment(String title, String address) {
-        businessTitle = title;
-        businessAddress = address;
+    public BusinessDetailFragment(BusinessDataModel clickedBusiness) {
+        this.businessDataModel = clickedBusiness;
     }
 
     @Nullable
@@ -36,7 +35,7 @@ public class BusinessDetailFragment extends Fragment {
 
         tvBusinessTitle = view.findViewById(R.id.tvBusinessTitle);
         tvBusinessAddress = view.findViewById(R.id.tvBusinessAddress);
-        tvBusinessTitle.setText(businessTitle);
-        tvBusinessAddress.setText(businessAddress);
+        tvBusinessTitle.setText(businessDataModel.getName());
+        tvBusinessAddress.setText(businessDataModel.getAddress());
     }
 }
