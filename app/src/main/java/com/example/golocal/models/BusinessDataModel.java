@@ -9,6 +9,7 @@ import com.parse.ParseObject;
 
 @ParseClassName("Business")
 public class BusinessDataModel extends ParseObject {
+
     public static final String KEY_NAME = "name";
     public static final String KEY_IMAGE = "image";
     public static final String KEY_ADDRESS = "address";

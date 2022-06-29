@@ -30,11 +30,13 @@ import java.util.Collections;
 import java.util.List;
 
 public class GuidesFragment extends Fragment {
+
+    private final String TAG = "GuidesFragment";
+
     private RecyclerView rvGuides;
     private List<GuideDataModel> guideDataModels;
     public GuidesAdapter adapter;
     private Context context;
-    private final String TAG = "GuidesFragment";
     private MainActivity mainActivity;
 
     public GuidesFragment(MainActivity main) {

@@ -25,16 +25,17 @@ import com.parse.ParseUser;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final static String KEY_LOCATION = "location";
+    private final static int MIN_TIME_INTERVAL = 10;
+    private final static int MIN_DISTANCE = 1;
+
     private BottomNavigationView bottomNavigationView;
+    private LocationManager locationManager;
+    private Location currentLocation;
     private ParseUser currentUser;
     public MapFragment mapFragment;
     public GuidesFragment guidesFragment;
     public ProfileFragment profileFragment;
-    private LocationManager locationManager;
-    private Location currentLocation;
-    private final static String KEY_LOCATION = "location";
-    private final static int MIN_TIME_INTERVAL = 10;
-    private final static int MIN_DISTANCE = 1;
     public final FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
@@ -63,9 +64,6 @@ public class MainActivity extends AppCompatActivity {
         currentUser = ParseUser.getCurrentUser();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        mapFragment = new MapFragment(this, currentLocation);
-        guidesFragment = new GuidesFragment(this);
-        profileFragment = new ProfileFragment(ParseUser.getCurrentUser());
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -73,13 +71,22 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment;
                 switch (item.getItemId()) {
                     case R.id.action_guides:
+                        if (guidesFragment == null) {
+                            guidesFragment = new GuidesFragment(MainActivity.this);
+                        }
                         fragment = guidesFragment;
                         break;
                     case R.id.action_profile:
+                        if (profileFragment == null) {
+                            profileFragment = new ProfileFragment(ParseUser.getCurrentUser());
+                        }
                         fragment = profileFragment;
                         break;
                     case R.id.action_map:
                     default:
+                        if (mapFragment == null ){
+                            mapFragment = new MapFragment(MainActivity.this, currentLocation);
+                        }
                         fragment = mapFragment;
                         break;
                 }

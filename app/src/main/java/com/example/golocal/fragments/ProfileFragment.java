@@ -45,6 +45,15 @@ import java.io.File;
 import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
+
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
+    private static final int PICK_PHOTO_CODE = 1046;
+    private final String photoFileName = "photo.jpg";
+
+    private final String KEY_BIO = "bio";
+    private final String KEY_IMAGE = "profileImage";
+    private final String TAG = "ProfileFragment";
+
     private TextView tvUsername;
     private TextView tvBio;
     private ImageView ivProfileImage;
@@ -54,14 +63,8 @@ public class ProfileFragment extends Fragment {
     private ImageButton ibEditProfileImage;
     private Button btChooseFromGallery;
     private ParseUser user;
-    private final String KEY_BIO = "bio";
-    private final String KEY_IMAGE = "profileImage";
     private Context context;
-    private final String TAG = "ProfileFragment";
-    public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
-    public final static int PICK_PHOTO_CODE = 1046;
     private File photoFile;
-    public String photoFileName = "photo.jpg";
 
     public ProfileFragment(ParseUser currentUser) {
         user = currentUser;
@@ -186,8 +189,7 @@ public class ProfileFragment extends Fragment {
         if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
-        File file = new File(mediaStorageDir.getPath() + File.separator + fileName);
-        return file;
+        return new File(mediaStorageDir.getPath() + File.separator + fileName);
     }
 
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -232,7 +234,7 @@ public class ProfileFragment extends Fragment {
         Bitmap image = null;
         try {
             // check version of Android on device
-            if(Build.VERSION.SDK_INT > 27){
+            if (Build.VERSION.SDK_INT > 27){
                 // on newer versions of Android, use the new decodeBitmap method
                 ImageDecoder.Source source = ImageDecoder.createSource(context.getContentResolver(), photoUri);
                 image = ImageDecoder.decodeBitmap(source);

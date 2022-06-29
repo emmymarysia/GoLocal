@@ -16,10 +16,11 @@ import com.parse.SignUpCallback;
 
 public class SignupActivity extends AppCompatActivity {
 
+    private final String TAG = "SignupActivity";
+
     private EditText etUsernameSignup;
     private EditText etPasswordSignup;
     private Button btSignup;
-    private final String TAG = "SignupActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

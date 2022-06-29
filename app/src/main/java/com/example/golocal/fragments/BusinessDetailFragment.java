@@ -31,12 +31,13 @@ import okhttp3.Response;
 
 public class BusinessDetailFragment extends Fragment {
 
+    private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
+
     private TextView tvBusinessTitle;
     private TextView tvBusinessAddress;
     private TextView tvBusinessDescription;
     private ImageView ivBusinessImage;
     private BusinessDataModel businessDataModel;
-    private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
     private OkHttpClient client = new OkHttpClient();
     private int screenWidth;
 
@@ -82,11 +83,9 @@ public class BusinessDetailFragment extends Fragment {
                     .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
                     .build();
 
-
-            Response response;
             String results;
             try {
-                response = client.newCall(request).execute();
+                Response response = client.newCall(request).execute();
                 results = response.body().string();
             } catch (IOException e) {
                 e.printStackTrace();

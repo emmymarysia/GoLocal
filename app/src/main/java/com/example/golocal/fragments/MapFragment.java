@@ -12,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,16 +52,18 @@ import okhttp3.Response;
 
 public class MapFragment extends Fragment {
 
+    private static final int CAMERA_ZOOM = 17;
+    private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+    private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private Location mCurrentLocation;
-    private MainActivity mainActivity;
-    private final static int CAMERA_ZOOM = 17;
-    private final static String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
-    private final static String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private OkHttpClient client = new OkHttpClient();
-    private static final DecimalFormat df = new DecimalFormat("0.00");
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
+    private MainActivity mainActivity;
+    private Button btFilterMap;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -109,6 +112,13 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setUpMapIfNeeded();
+        btFilterMap = view.findViewById(R.id.btFilterMap);
+        btFilterMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     public void updateLocation(Location location) {
