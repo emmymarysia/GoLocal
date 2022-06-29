@@ -22,6 +22,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.golocal.AsyncTasks.AutocompleteCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -53,15 +54,12 @@ import okhttp3.Response;
 public class MapFragment extends Fragment {
 
     private static final int CAMERA_ZOOM = 17;
-    private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
-    private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private Location mCurrentLocation;
-    private OkHttpClient client = new OkHttpClient();
-    private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
+    public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
 
@@ -84,8 +82,15 @@ public class MapFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                SearchQueryCall call = new SearchQueryCall();
-                call.execute(query);
+                Double latitude = mCurrentLocation.getLatitude();
+                Double longitude = mCurrentLocation.getLongitude();
+                String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
+                AutocompleteCall call = new AutocompleteCall();
+                call.setGoogleMap(map);
+                call.setMapFragment(MapFragment.this);
+                call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
+                // queryResultBusinesses.clear();
+                // queryResultBusinesses.putAll(call.getQueryResultBusinesses());
                 searchView.clearFocus();
                 map.clear();
                 return true;
@@ -94,8 +99,11 @@ public class MapFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.length() >= 3) {
+                    Double latitude = mCurrentLocation.getLatitude();
+                    Double longitude = mCurrentLocation.getLongitude();
+                    String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
                     AutocompleteCall call = new AutocompleteCall();
-                    call.execute(newText);
+                    call.execute(newText, userLocation, getResources().getString(R.string.foursquare_api_key), "autocomplete");
                 }
                 return false;
             }
@@ -174,98 +182,4 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private class AutocompleteCall extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... params) {
-            Double latitude = mCurrentLocation.getLatitude();
-            Double longitude = mCurrentLocation.getLongitude();
-            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
-            Request request = new Request.Builder()
-                    .url(AUTOCOMPLETE_URL + params[0] + "&ll=" + latlng)
-                    .get()
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
-                    .build();
-
-            Response response;
-            String results;
-            try {
-                response = client.newCall(request).execute();
-                results = response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return results;
-        }
-    }
-
-    private class SearchQueryCall extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            Double latitude = mCurrentLocation.getLatitude();
-            Double longitude = mCurrentLocation.getLongitude();
-            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
-            Request request = new Request.Builder()
-                    .url(SEARCH_URL + params[0] + "&ll=" + latlng + "&exclude_all_chains=true")
-                    .get()
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
-                    .build();
-
-
-            Response response;
-            String results;
-            try {
-                response = client.newCall(request).execute();
-                results = response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return results;
-        }
-
-        protected void onPostExecute(String results) {
-            try {
-                queryResultsFromJson(results);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void queryResultsFromJson(String data) throws JSONException {
-        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-        JSONObject queryResponse = new JSONObject(data);
-        LatLng mapCenter = null;
-        JSONArray results = queryResponse.getJSONArray("results");
-        queryResultBusinesses.clear();
-        for (int i = 0; i < results.length(); i++) {
-            JSONObject business = results.getJSONObject(i);
-            String address = business.getJSONObject("location").getString("address");
-            String foursquareId = business.getString("fsq_id");
-            String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
-            String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
-            LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-            if (i == 0) {
-                mapCenter = markerPosition;
-            }
-            String businessName = business.getString("name");
-            BusinessDataModel currentBusiness = new BusinessDataModel();
-            currentBusiness.setName(businessName);
-            currentBusiness.setAddress(address);
-            currentBusiness.setFoursquareId(foursquareId);
-            Marker mapMarker = map.addMarker(new MarkerOptions()
-                    .position(markerPosition)
-                    .title(businessName)
-                    .snippet(address)
-                    .icon(defaultMarker));
-            queryResultBusinesses.put(mapMarker, currentBusiness);
-        }
-        if (mapCenter != null) {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
-        }
-    }
 }
