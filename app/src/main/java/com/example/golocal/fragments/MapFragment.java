@@ -122,7 +122,7 @@ public class MapFragment extends Fragment {
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: implement going to filter fragment
             }
         });
     }
