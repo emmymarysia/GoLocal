@@ -46,6 +46,8 @@ import java.io.IOException;
 
 public class ProfileFragment extends Fragment {
 
+    // hello
+
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     private static final int PICK_PHOTO_CODE = 1046;
     private final String photoFileName = "photo.jpg";
