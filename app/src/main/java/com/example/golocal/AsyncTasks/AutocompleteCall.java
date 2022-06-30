@@ -131,6 +131,8 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         if (mapCenter != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
         }
+
+        // set the results hashmap back in the mapFragment
         mapFragment.queryResultBusinesses.clear();
         mapFragment.queryResultBusinesses.putAll(this.queryResultBusinesses);
     }

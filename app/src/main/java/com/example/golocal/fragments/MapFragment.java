@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.golocal.AsyncTasks.AutocompleteCall;
+import com.example.golocal.DBHandler;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -62,6 +63,7 @@ public class MapFragment extends Fragment {
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
+    private DBHandler dbHandler;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -89,8 +91,6 @@ public class MapFragment extends Fragment {
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
                 call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
-                // queryResultBusinesses.clear();
-                // queryResultBusinesses.putAll(call.getQueryResultBusinesses());
                 searchView.clearFocus();
                 map.clear();
                 return true;
@@ -120,6 +120,7 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setUpMapIfNeeded();
+        dbHandler = new DBHandler(getContext());
         btFilterMap = view.findViewById(R.id.btFilterMap);
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
