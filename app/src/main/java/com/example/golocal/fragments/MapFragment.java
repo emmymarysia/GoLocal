@@ -63,7 +63,7 @@ public class MapFragment extends Fragment {
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
-    private DBHandler dbHandler;
+    public DBHandler dbHandler;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -73,6 +73,7 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dbHandler = new DBHandler(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -103,6 +104,7 @@ public class MapFragment extends Fragment {
                     Double longitude = mCurrentLocation.getLongitude();
                     String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
                     AutocompleteCall call = new AutocompleteCall();
+                    call.setMapFragment(MapFragment.this);
                     call.execute(newText, userLocation, getResources().getString(R.string.foursquare_api_key), "autocomplete");
                 }
                 return false;
@@ -120,7 +122,6 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setUpMapIfNeeded();
-        dbHandler = new DBHandler(getContext());
         btFilterMap = view.findViewById(R.id.btFilterMap);
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override

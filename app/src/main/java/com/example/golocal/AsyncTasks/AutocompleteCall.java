@@ -1,6 +1,7 @@
 package com.example.golocal.AsyncTasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.golocal.R;
 import com.example.golocal.fragments.MapFragment;
@@ -60,7 +61,13 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String results) {
         if (requestType.equals("searchQuery")) {
             try {
-                queryResultsFromJson(results);
+                querySearchResultsFromJson(results);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else if (requestType.equals("autocomplete")) {
+            try {
+                queryAutocompleteResultsFromJson(results);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -100,7 +107,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         this.mapFragment = mapFragment;
     }
 
-    public void queryResultsFromJson(String data) throws JSONException {
+    public void querySearchResultsFromJson(String data) throws JSONException {
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         JSONObject queryResponse = new JSONObject(data);
         LatLng mapCenter = null;
@@ -135,5 +142,17 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         // set the results hashmap back in the mapFragment
         mapFragment.queryResultBusinesses.clear();
         mapFragment.queryResultBusinesses.putAll(this.queryResultBusinesses);
+    }
+
+    public void queryAutocompleteResultsFromJson(String data) throws JSONException {
+        JSONObject autocompleteResponse = new JSONObject(data);
+        JSONArray results = autocompleteResponse.getJSONArray("results");
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject recommendation = results.getJSONObject(i);
+            JSONObject text = recommendation.getJSONObject("text");
+            String primaryText = text.getString("primary");
+            mapFragment.dbHandler.addSearchSuggestion(primaryText);
+            Log.i("Autocomplete", "adding " + primaryText);
+        }
     }
 }

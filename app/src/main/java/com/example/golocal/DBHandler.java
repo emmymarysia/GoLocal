@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 public class DBHandler extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "autocompletedb";
-    private static final int DB_VERSION = 1;
+    private static int DB_VERSION = 2;
     private static final String TABLE_NAME = "autocompleteSuggestions";
     private static final String ID_COL = "id";
     private static final String NAME_COL = "name";
@@ -22,15 +22,15 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_NAME + " ("
                 + ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + NAME_COL + "TEXT)";
+                + NAME_COL + " TEXT)";
         db.execSQL(query);
     }
 
-    public void addSearchSuggestion(String businessName) {
+    public void addSearchSuggestion(String suggestionText) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(NAME_COL, businessName);
+        values.put(NAME_COL, suggestionText);
 
         db.insert(TABLE_NAME, null, values);
         db.close();
@@ -39,6 +39,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        DB_VERSION = newVersion;
         onCreate(db);
     }
 }
