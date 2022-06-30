@@ -89,8 +89,6 @@ public class MapFragment extends Fragment {
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
                 call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
-                // queryResultBusinesses.clear();
-                // queryResultBusinesses.putAll(call.getQueryResultBusinesses());
                 searchView.clearFocus();
                 map.clear();
                 return true;
@@ -124,7 +122,7 @@ public class MapFragment extends Fragment {
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: implement going to filter fragment
             }
         });
     }
