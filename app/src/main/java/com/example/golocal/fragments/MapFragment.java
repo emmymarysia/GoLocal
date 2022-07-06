@@ -61,6 +61,7 @@ public class MapFragment extends Fragment {
     private GoogleMap map;
     private Location mCurrentLocation;
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
+    public ArrayList<BusinessDataModel> autocompleteResults = new ArrayList<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
     public DBHandler dbHandler;

@@ -9,6 +9,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class MapAutocompleteProvider extends ContentProvider {
+
+    static final String PROVIDER_NAME = "com.example.golocal.provider";
+    static final String URL = "content://" + PROVIDER_NAME + "/id/";
+    static final Uri CONTENT_URI = Uri.parse(URL);
+
     @Override
     public boolean onCreate() {
         return false;
@@ -17,6 +22,8 @@ public class MapAutocompleteProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        // get parse object associated with that object id
+        // somehow set the array as the search results
         return null;
     }
 

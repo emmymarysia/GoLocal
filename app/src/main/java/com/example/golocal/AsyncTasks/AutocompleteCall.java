@@ -3,8 +3,10 @@ package com.example.golocal.AsyncTasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.golocal.MapAutocompleteProvider;
 import com.example.golocal.R;
 import com.example.golocal.fragments.MapFragment;
+import com.example.golocal.models.AutocompleteResultDataModel;
 import com.example.golocal.models.BusinessDataModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,12 +15,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.parse.ParseException;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
@@ -30,6 +35,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private static final int CAMERA_ZOOM = 17;
+    private final String TAG = "AutocompleteCall";
 
     private OkHttpClient client = new OkHttpClient();
     private String searchText;
@@ -39,6 +45,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     private GoogleMap map;
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
+    private MapAutocompleteProvider provider = new MapAutocompleteProvider();
 
     @Override
     protected String doInBackground(String... params) {
@@ -147,12 +154,29 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     public void queryAutocompleteResultsFromJson(String data) throws JSONException {
         JSONObject autocompleteResponse = new JSONObject(data);
         JSONArray results = autocompleteResponse.getJSONArray("results");
+        AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
+        ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         for (int i = 0; i < results.length(); i++) {
+            BusinessDataModel business = new BusinessDataModel();
             JSONObject recommendation = results.getJSONObject(i);
             JSONObject text = recommendation.getJSONObject("text");
             String primaryText = text.getString("primary");
-            mapFragment.dbHandler.addSearchSuggestion(primaryText);
+            // mapFragment.dbHandler.addSearchSuggestion(primaryText);
+            business.setName(primaryText);
+            resultBusinesses.add(business);
             Log.i("Autocomplete", "adding " + primaryText);
         }
+        autocompleteResults.setResultBusinesses(resultBusinesses);
+        autocompleteResults.setQueryText(searchText);
+        String objectId = autocompleteResults.getObjectId();
+        autocompleteResults.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Error while saving autocomplete result", e);
+                }
+            }
+        });
+        // create new query from provider with the object id
     }
 }
