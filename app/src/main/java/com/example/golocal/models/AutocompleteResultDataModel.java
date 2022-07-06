@@ -11,6 +11,8 @@ public class AutocompleteResultDataModel extends ParseObject {
     public static final String KEY_BUSINESS_ARRAY = "resultBusinesses";
     public static final String KEY_QUERY_TEXT = "queryText";
 
+    public AutocompleteResultDataModel() {}
+
     public List<BusinessDataModel> getResultBusinesses() {
         return getList(KEY_BUSINESS_ARRAY);
     }

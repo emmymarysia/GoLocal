@@ -1,5 +1,7 @@
 package com.example.golocal.AsyncTasks;
 
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
 import org.json.JSONArray;
@@ -35,6 +38,8 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private static final int CAMERA_ZOOM = 17;
+    private static final String PROVIDER_NAME = "com.example.golocal.provider";
+    private static final String URL = "content://" + PROVIDER_NAME + "/id/";
     private final String TAG = "AutocompleteCall";
 
     private OkHttpClient client = new OkHttpClient();
@@ -66,6 +71,9 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String results) {
+        if (results == null) {
+            Log.i("Autocomplete", "tf???");
+        }
         if (requestType.equals("searchQuery")) {
             try {
                 querySearchResultsFromJson(results);
@@ -95,6 +103,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
             Response response = client.newCall(request).execute();
             results = response.body().string();
         } catch (IOException e) {
+            Log.e("autocomplete", "hellppppp", e);
             e.printStackTrace();
             return null;
         }
@@ -152,6 +161,9 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     }
 
     public void queryAutocompleteResultsFromJson(String data) throws JSONException {
+        if (data == null) {
+            return;
+        }
         JSONObject autocompleteResponse = new JSONObject(data);
         JSONArray results = autocompleteResponse.getJSONArray("results");
         AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
@@ -168,7 +180,6 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         }
         autocompleteResults.setResultBusinesses(resultBusinesses);
         autocompleteResults.setQueryText(searchText);
-        String objectId = autocompleteResults.getObjectId();
         autocompleteResults.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -177,6 +188,9 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
                 }
             }
         });
+        String objectId = autocompleteResults.getObjectId();
         // create new query from provider with the object id
+        String requestUrl = URL + searchText;
+        // Cursor cursor = provider.query(Uri.parse(requestUrl), null, null, null);
     }
 }
