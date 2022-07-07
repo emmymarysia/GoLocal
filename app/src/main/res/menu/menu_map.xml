@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_search"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         android:title="Search"
         android:icon="@android:drawable/ic_menu_search"
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:searchSuggestAuthority="com.example.golocal.MapAutocompleteProvider"
+        android:searchSuggestSelection="word MATCH ?"
         android:focusableInTouchMode="true"/>
 
 </menu>
