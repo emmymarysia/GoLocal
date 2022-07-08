@@ -70,7 +70,7 @@ public class MapAutocompleteProvider extends ContentProvider {
                 userLocation = df.format(latitude) + "%2C" + df.format(longitude);
             }
         }
-        call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete");
+        call.execute(searchText, userLocation, getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete");
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
         while (call.autocompleteResults.getResultBusinesses() == null) {
             continue;
