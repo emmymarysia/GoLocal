@@ -38,43 +38,17 @@ public class MapAutocompleteProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        // get parse object associated with that object id
-        // String objectId = uri.getLastPathSegment();
-        String objectId = selectionArgs[0];
-        Log.e("MapAutocomplete", objectId);
+        String searchText = selectionArgs[0];
+        Log.e("MapAutocomplete", searchText);
         ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
-        query.whereEqualTo("queryText", objectId);
+        query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
 
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1 });
-        /*
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if(e == null){
-                    if (objects.size() > 0) {
-                        AutocompleteResultDataModel results = (AutocompleteResultDataModel) objects.get(0);
-                        resultBusinesses.addAll(results.getResultBusinesses());
-                        if (resultBusinesses.size() > 0) {
-                            for (int i = 0; i < resultBusinesses.size(); i++) {
-                                BusinessDataModel searchSuggestion = resultBusinesses.get(i);
-                                cursor.newRow()
-                                        .add(BaseColumns._ID, searchSuggestion.getObjectId())
-                                        .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName());
-                                Log.e("MapAutocomplete", searchSuggestion.getName());
-                            }
-                        }
-                    }
-                } else{
-                    Log.e(TAG, "error retrieving parse object", e);
-                }
-            }
-        }); */
         Log.e("cursor", String.valueOf(cursor.getCount()));
         AutocompleteResultDataModel results = null;
         while (results == null) {
             try {
-                Log.e("hello", "hello");
                 results = (AutocompleteResultDataModel) query.find().get(0);
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -90,7 +64,6 @@ public class MapAutocompleteProvider extends ContentProvider {
                 Log.e("MapAutocomplete", searchSuggestion.getName());
             }
         }
-        Log.e("mapautocomplete", "returning");
         return cursor;
     }
 
