@@ -70,25 +70,25 @@ public class MapAutocompleteProvider extends ContentProvider {
                 }
             }
         }); */
-        try {
-            while (query.getFirst() == null) {
-                Log.e("hello", "hello2");
-                continue;
+        Log.e("cursor", String.valueOf(cursor.getCount()));
+        AutocompleteResultDataModel results = null;
+        while (results == null) {
+            try {
+                Log.e("hello", "hello");
+                results = (AutocompleteResultDataModel) query.find().get(0);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            Log.e("hello", "hello");
-            AutocompleteResultDataModel results = (AutocompleteResultDataModel) query.find().get(0);
-            resultBusinesses.addAll(results.getResultBusinesses());
-            if (resultBusinesses.size() > 0) {
-                for (int i = 0; i < resultBusinesses.size(); i++) {
-                    BusinessDataModel searchSuggestion = resultBusinesses.get(i);
-                    cursor.newRow()
-                            .add(BaseColumns._ID, i)
-                            .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName());
-                    Log.e("MapAutocomplete", searchSuggestion.getName());
-                }
+        }
+        resultBusinesses.addAll(results.getResultBusinesses());
+        if (resultBusinesses.size() > 0) {
+            for (int i = 0; i < resultBusinesses.size(); i++) {
+                BusinessDataModel searchSuggestion = resultBusinesses.get(i);
+                cursor.newRow()
+                        .add(BaseColumns._ID, i)
+                        .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName());
+                Log.e("MapAutocomplete", searchSuggestion.getName());
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         Log.e("mapautocomplete", "returning");
         return cursor;
