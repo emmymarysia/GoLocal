@@ -20,7 +20,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +32,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class AutocompleteCall extends AsyncTask<String, Void, String> {
+public class APICall extends AsyncTask<String, Void, String> {
 
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
@@ -51,6 +50,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
     private MapAutocompleteProvider provider = new MapAutocompleteProvider();
+    public AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
 
     @Override
     protected String doInBackground(String... params) {
@@ -71,9 +71,6 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String results) {
-        if (results == null) {
-            Log.i("Autocomplete", "tf???");
-        }
         if (requestType.equals("searchQuery")) {
             try {
                 querySearchResultsFromJson(results);
@@ -166,7 +163,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         }
         JSONObject autocompleteResponse = new JSONObject(data);
         JSONArray results = autocompleteResponse.getJSONArray("results");
-        AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
+        // AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         for (int i = 0; i < results.length(); i++) {
             BusinessDataModel business = new BusinessDataModel();
@@ -180,6 +177,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
         }
         autocompleteResults.setResultBusinesses(resultBusinesses);
         autocompleteResults.setQueryText(searchText);
+        /*
         autocompleteResults.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -188,9 +186,6 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
                 }
             }
         });
-        String objectId = autocompleteResults.getObjectId();
-        // create new query from provider with the object id
-        String requestUrl = URL + searchText;
-        // Cursor cursor = provider.query(Uri.parse(requestUrl), null, null, null);
+        */
     }
 }

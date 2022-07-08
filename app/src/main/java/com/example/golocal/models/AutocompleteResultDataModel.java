@@ -28,4 +28,8 @@ public class AutocompleteResultDataModel extends ParseObject {
     public void setQueryText(String query) {
         put(KEY_QUERY_TEXT, query);
     }
+
+    public int getResultBusinessesCount() {
+        return getList(KEY_BUSINESS_ARRAY).size();
+    }
 }

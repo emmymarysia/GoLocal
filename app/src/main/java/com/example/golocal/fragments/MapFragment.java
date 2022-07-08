@@ -5,9 +5,7 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 import android.app.SearchManager;
 import android.content.Context;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,17 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.golocal.AsyncTasks.AutocompleteCall;
+import com.example.golocal.AsyncTasks.APICall;
 import com.example.golocal.DBHandler;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
@@ -35,24 +31,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class MapFragment extends Fragment {
@@ -95,7 +79,7 @@ public class MapFragment extends Fragment {
                 Double latitude = mCurrentLocation.getLatitude();
                 Double longitude = mCurrentLocation.getLongitude();
                 String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                AutocompleteCall call = new AutocompleteCall();
+                APICall call = new APICall();
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
                 call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
@@ -110,7 +94,7 @@ public class MapFragment extends Fragment {
                     Double latitude = mCurrentLocation.getLatitude();
                     Double longitude = mCurrentLocation.getLongitude();
                     String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                    AutocompleteCall call = new AutocompleteCall();
+                    APICall call = new APICall();
                     call.setMapFragment(MapFragment.this);
                     call.execute(newText, userLocation, getResources().getString(R.string.foursquare_api_key), "autocomplete");
                 }
@@ -118,6 +102,7 @@ public class MapFragment extends Fragment {
             }
         });
     }
+
 
     @Nullable
     @Override
