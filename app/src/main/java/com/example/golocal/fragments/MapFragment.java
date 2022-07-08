@@ -22,7 +22,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.golocal.AsyncTasks.APICall;
-import com.example.golocal.DBHandler;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -51,7 +50,6 @@ public class MapFragment extends Fragment {
     public ArrayList<BusinessDataModel> autocompleteResults = new ArrayList<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
-    public DBHandler dbHandler;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -61,7 +59,6 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHandler = new DBHandler(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -72,7 +69,6 @@ public class MapFragment extends Fragment {
         SearchManager searchManager = (SearchManager) mainActivity.getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(mainActivity.getComponentName()));
-        // searchView.setSuggestionsAdapter();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -90,14 +86,7 @@ public class MapFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() >= 3) {
-                    Double latitude = mCurrentLocation.getLatitude();
-                    Double longitude = mCurrentLocation.getLongitude();
-                    String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                    APICall call = new APICall();
-                    call.setMapFragment(MapFragment.this);
-                    call.execute(newText, userLocation, getResources().getString(R.string.foursquare_api_key), "autocomplete");
-                }
+                // TODO: implement checking for intent and action if a suggestion is clicked
                 return false;
             }
         });

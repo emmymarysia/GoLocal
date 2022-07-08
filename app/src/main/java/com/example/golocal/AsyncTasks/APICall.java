@@ -163,29 +163,17 @@ public class APICall extends AsyncTask<String, Void, String> {
         }
         JSONObject autocompleteResponse = new JSONObject(data);
         JSONArray results = autocompleteResponse.getJSONArray("results");
-        // AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         for (int i = 0; i < results.length(); i++) {
             BusinessDataModel business = new BusinessDataModel();
             JSONObject recommendation = results.getJSONObject(i);
             JSONObject text = recommendation.getJSONObject("text");
             String primaryText = text.getString("primary");
-            // mapFragment.dbHandler.addSearchSuggestion(primaryText);
             business.setName(primaryText);
             resultBusinesses.add(business);
             Log.i("Autocomplete", "adding " + primaryText);
         }
         autocompleteResults.setResultBusinesses(resultBusinesses);
         autocompleteResults.setQueryText(searchText);
-        /*
-        autocompleteResults.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving autocomplete result", e);
-                }
-            }
-        });
-        */
     }
 }

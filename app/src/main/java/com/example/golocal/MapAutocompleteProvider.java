@@ -38,14 +38,9 @@ import java.util.List;
 public class MapAutocompleteProvider extends ContentProvider {
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    static final String PROVIDER_NAME = "com.example.golocal.MapAutocompleteProvider";
-    static final String URL = "content://" + PROVIDER_NAME + "/id/";
-    static final Uri CONTENT_URI = Uri.parse(URL);
-    private final String TAG = "MapAutocompleteProvider";
 
     @Override
     public boolean onCreate() {
-        Log.e("mapautocomplete", "create");
         return true;
     }
 
@@ -56,7 +51,6 @@ public class MapAutocompleteProvider extends ContentProvider {
         if (searchText.length() < 3) {
             return null;
         }
-        Log.e("MapAutocomplete", searchText);
         ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
         query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
@@ -78,8 +72,6 @@ public class MapAutocompleteProvider extends ContentProvider {
         }
         call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete");
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
-        Log.e("cursor", String.valueOf(cursor.getCount()));
-        AutocompleteResultDataModel results = call.autocompleteResults;
         while (call.autocompleteResults.getResultBusinesses() == null) {
             continue;
         }
@@ -92,7 +84,6 @@ public class MapAutocompleteProvider extends ContentProvider {
                         .add(BaseColumns._ID, i)
                         .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())
                         .add(SearchManager.SUGGEST_COLUMN_INTENT_DATA, id);
-                Log.e("MapAutocomplete", searchSuggestion.getName());
             }
         }
         return cursor;
