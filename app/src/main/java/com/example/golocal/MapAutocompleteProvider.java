@@ -71,6 +71,11 @@ public class MapAutocompleteProvider extends ContentProvider {
             }
         }); */
         try {
+            while (query.getFirst() == null) {
+                Log.e("hello", "hello2");
+                continue;
+            }
+            Log.e("hello", "hello");
             AutocompleteResultDataModel results = (AutocompleteResultDataModel) query.find().get(0);
             resultBusinesses.addAll(results.getResultBusinesses());
             if (resultBusinesses.size() > 0) {
@@ -82,11 +87,11 @@ public class MapAutocompleteProvider extends ContentProvider {
                     Log.e("MapAutocomplete", searchSuggestion.getName());
                 }
             }
-            return cursor;
         } catch (ParseException e) {
             e.printStackTrace();
-            return null;
         }
+        Log.e("mapautocomplete", "returning");
+        return cursor;
     }
 
     @Nullable
