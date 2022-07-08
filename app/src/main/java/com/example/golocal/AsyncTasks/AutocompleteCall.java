@@ -29,6 +29,7 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private static final int CAMERA_ZOOM = 17;
+    private static final BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
 
     private OkHttpClient client = new OkHttpClient();
     private String searchText;
@@ -101,37 +102,45 @@ public class AutocompleteCall extends AsyncTask<String, Void, String> {
     }
 
     public void queryResultsFromJson(String data) throws JSONException {
-        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         JSONObject queryResponse = new JSONObject(data);
         LatLng mapCenter = null;
         JSONArray results = queryResponse.getJSONArray("results");
         queryResultBusinesses.clear();
         for (int i = 0; i < results.length(); i++) {
             JSONObject business = results.getJSONObject(i);
-            String address = business.getJSONObject("location").getString("address");
-            String foursquareId = business.getString("fsq_id");
-            String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
-            String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
-            LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+            LatLng markerPosition = createBusinessModelFromJson(business);
             if (i == 0) {
                 mapCenter = markerPosition;
             }
-            String businessName = business.getString("name");
-            BusinessDataModel currentBusiness = new BusinessDataModel();
-            currentBusiness.setName(businessName);
-            currentBusiness.setAddress(address);
-            currentBusiness.setFoursquareId(foursquareId);
-            Marker mapMarker = map.addMarker(new MarkerOptions()
-                    .position(markerPosition)
-                    .title(businessName)
-                    .snippet(address)
-                    .icon(defaultMarker));
-            queryResultBusinesses.put(mapMarker, currentBusiness);
         }
         if (mapCenter != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
         }
         mapFragment.queryResultBusinesses.clear();
         mapFragment.queryResultBusinesses.putAll(this.queryResultBusinesses);
+    }
+
+    public LatLng createBusinessModelFromJson(JSONObject business) throws JSONException {
+        String address = business.getJSONObject("location").getString("address");
+        String foursquareId = business.getString("fsq_id");
+        String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
+        String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
+        LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        String businessName = business.getString("name");
+        BusinessDataModel currentBusiness = new BusinessDataModel();
+        currentBusiness.setName(businessName);
+        currentBusiness.setAddress(address);
+        currentBusiness.setFoursquareId(foursquareId);
+        addMapMarker(markerPosition, businessName, address, currentBusiness);
+        return markerPosition;
+    }
+
+    public void addMapMarker(LatLng markerPosition, String businessName, String address, BusinessDataModel currentBusiness) {
+        Marker mapMarker = map.addMarker(new MarkerOptions()
+                .position(markerPosition)
+                .title(businessName)
+                .snippet(address)
+                .icon(defaultMarker));
+        queryResultBusinesses.put(mapMarker, currentBusiness);
     }
 }
