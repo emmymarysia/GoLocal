@@ -18,10 +18,11 @@ import com.parse.ParseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
+    private final String TAG = "LoginActivity";
+
     private EditText etUsernameLogin;
     private EditText etPasswordLogin;
     private Button btLogin;
-    private final String TAG = "LoginActivity";
     private TextView tvSignup;
 
     @Override

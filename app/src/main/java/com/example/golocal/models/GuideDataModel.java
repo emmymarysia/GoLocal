@@ -9,6 +9,7 @@ import java.util.List;
 
 @ParseClassName("Guide")
 public class GuideDataModel extends ParseObject {
+
     public static final String KEY_AUTHOR = "author";
     public static final String KEY_TITLE = "title";
     public static final String KEY_LIKEDBY = "likedBy";
