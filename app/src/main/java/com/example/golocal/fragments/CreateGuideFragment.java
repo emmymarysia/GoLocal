@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateGuideFragment extends Fragment {
+
+    private final String TAG = "CreateGuideFragment";
+
     private EditText etTitle;
     private EditText etDescription;
     private RecyclerView rvBusinesses;
@@ -39,7 +42,6 @@ public class CreateGuideFragment extends Fragment {
     private List<BusinessDataModel> businessDataModelList;
     private MainActivity mainActivity;
     private BusinessAdapter adapter;
-    private final String TAG = "CreateGuideFragment";
 
     public CreateGuideFragment(MainActivity main) {
         mainActivity = main;
