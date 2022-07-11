@@ -71,7 +71,7 @@ public class MapAutocompleteProvider extends ContentProvider {
             }
         }
         call.execute(searchText, userLocation, getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete");
-        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
+        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID});
         while (call.autocompleteResults.getResultBusinesses() == null) {
             continue;
         }
@@ -83,7 +83,8 @@ public class MapAutocompleteProvider extends ContentProvider {
                 cursor.newRow()
                         .add(BaseColumns._ID, i)
                         .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())
-                        .add(SearchManager.SUGGEST_COLUMN_INTENT_DATA, id);
+                        .add(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, id);
+                Log.e("cursor", id);
             }
         }
         return cursor;

@@ -9,6 +9,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,7 +66,7 @@ public class MapFragment extends Fragment {
     private MainActivity mainActivity;
     private Button btFilterMap;
     private OkHttpClient client = new OkHttpClient();
-    private BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+    private BitmapDescriptor defaultMarker;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -79,16 +80,20 @@ public class MapFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
-
+            PlaceQueryCall call = new PlaceQueryCall();
+            call.execute(businessFoursquareId);
         }
     }
 
-    private void addMarker(LatLng markerPosition, String businessName, String address) {
-        map.addMarker(new MarkerOptions()
+    private void addMarker(LatLng markerPosition, BusinessDataModel businessDataModel) {
+        Marker mapMarker = map.addMarker(new MarkerOptions()
                 .position(markerPosition)
-                .title(businessName)
-                .snippet(address)
+                .title(businessDataModel.getName())
+                .snippet(businessDataModel.getAddress())
                 .icon(defaultMarker));
+        queryResultBusinesses.put(mapMarker, businessDataModel);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(markerPosition, CAMERA_ZOOM);
+        map.animateCamera(cameraUpdate);
     }
 
     @Override
@@ -131,6 +136,7 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setUpMapIfNeeded();
+        defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         btFilterMap = view.findViewById(R.id.btFilterMap);
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,7 +204,7 @@ public class MapFragment extends Fragment {
         @Override
         protected String doInBackground(String... params) {
             Request request = new Request.Builder()
-                    .url(PLACES_URL + params[0] + "?fields=description,photos")
+                    .url(PLACES_URL + params[0])
                     .get()
                     .addHeader("Accept", "application/json")
                     .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
@@ -208,6 +214,7 @@ public class MapFragment extends Fragment {
             try {
                 Response response = client.newCall(request).execute();
                 results = response.body().string();
+                Log.e("results", results);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -220,8 +227,13 @@ public class MapFragment extends Fragment {
                 JSONObject jsonResults = new JSONObject(results);
                 String name = jsonResults.getString("name");
                 String address = jsonResults.getJSONObject("location").getString("address");
-                String latitude = jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
-                String longitude = jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
+                Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
+                Double longitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude"));
+                LatLng businessLocation = new LatLng(latitude, longitude);
+                BusinessDataModel businessDataModel = new BusinessDataModel();
+                businessDataModel.setName(name);
+                businessDataModel.setAddress(address);
+                addMarker(businessLocation, businessDataModel);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
