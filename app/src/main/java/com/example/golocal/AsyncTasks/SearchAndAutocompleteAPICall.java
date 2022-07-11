@@ -32,7 +32,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class APICall extends AsyncTask<String, Void, String> {
+public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String> {
 
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
@@ -100,7 +100,6 @@ public class APICall extends AsyncTask<String, Void, String> {
             Response response = client.newCall(request).execute();
             results = response.body().string();
         } catch (IOException e) {
-            Log.e("autocomplete", "hellppppp", e);
             e.printStackTrace();
             return null;
         }
@@ -176,7 +175,6 @@ public class APICall extends AsyncTask<String, Void, String> {
                 business.setFoursquareId(foursquareId);
                 business.setName(primaryText);
                 resultBusinesses.add(business);
-                Log.i("Autocomplete", "adding " + primaryText);
             }
         }
         autocompleteResults.setResultBusinesses(resultBusinesses);

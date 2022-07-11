@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.LocationRequest;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
@@ -22,12 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.golocal.AsyncTasks.APICall;
-import com.example.golocal.activities.MainActivity;
-import com.example.golocal.models.AutocompleteResultDataModel;
+import com.example.golocal.AsyncTasks.SearchAndAutocompleteAPICall;
 import com.example.golocal.models.BusinessDataModel;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -54,7 +49,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
         query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
-        APICall call = new APICall();
+        SearchAndAutocompleteAPICall call = new SearchAndAutocompleteAPICall();
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
@@ -84,7 +79,6 @@ public class MapAutocompleteProvider extends ContentProvider {
                         .add(BaseColumns._ID, i)
                         .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())
                         .add(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, id);
-                Log.e("cursor", id);
             }
         }
         return cursor;

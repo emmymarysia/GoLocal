@@ -6,14 +6,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,7 +21,8 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.golocal.AsyncTasks.APICall;
+import com.example.golocal.AsyncTasks.PlacesAPICall;
+import com.example.golocal.AsyncTasks.SearchAndAutocompleteAPICall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -40,24 +37,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class MapFragment extends Fragment {
 
-    private static final int CAMERA_ZOOM = 17;
+    public static final int CAMERA_ZOOM = 17;
     private static final DecimalFormat df = new DecimalFormat("0.00");
-    private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -66,7 +55,7 @@ public class MapFragment extends Fragment {
     private MainActivity mainActivity;
     private Button btFilterMap;
     private OkHttpClient client = new OkHttpClient();
-    private BitmapDescriptor defaultMarker;
+    private PlacesAPICall call = new PlacesAPICall();
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -80,12 +69,13 @@ public class MapFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
-            PlaceQueryCall call = new PlaceQueryCall();
-            call.execute(businessFoursquareId);
+            call.setMapFragment(this);
+            call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_MAP_FRAGMENT);
         }
     }
 
-    private void addMarker(LatLng markerPosition, BusinessDataModel businessDataModel) {
+    public void addMarker(LatLng markerPosition, BusinessDataModel businessDataModel) {
+        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         Marker mapMarker = map.addMarker(new MarkerOptions()
                 .position(markerPosition)
                 .title(businessDataModel.getName())
@@ -108,7 +98,7 @@ public class MapFragment extends Fragment {
                 Double latitude = mCurrentLocation.getLatitude();
                 Double longitude = mCurrentLocation.getLongitude();
                 String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                APICall call = new APICall();
+                SearchAndAutocompleteAPICall call = new SearchAndAutocompleteAPICall();
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
                 call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
@@ -119,7 +109,6 @@ public class MapFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // TODO: implement checking for intent and action if a suggestion is clicked
                 return false;
             }
         });
@@ -136,12 +125,11 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setUpMapIfNeeded();
-        defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         btFilterMap = view.findViewById(R.id.btFilterMap);
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: implement listener for filter button
             }
         });
     }
@@ -177,8 +165,6 @@ public class MapFragment extends Fragment {
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                String title = marker.getTitle();
-                String address = marker.getSnippet();
                 BusinessDataModel clickedBusiness = queryResultBusinesses.get(marker);
                 BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(clickedBusiness);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction();
@@ -198,46 +184,4 @@ public class MapFragment extends Fragment {
             map.animateCamera(cameraUpdate);
         }
     }
-
-    private class PlaceQueryCall extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            Request request = new Request.Builder()
-                    .url(PLACES_URL + params[0])
-                    .get()
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
-                    .build();
-
-            String results;
-            try {
-                Response response = client.newCall(request).execute();
-                results = response.body().string();
-                Log.e("results", results);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-            return results;
-        }
-
-        protected void onPostExecute(String results) {
-            try {
-                JSONObject jsonResults = new JSONObject(results);
-                String name = jsonResults.getString("name");
-                String address = jsonResults.getJSONObject("location").getString("address");
-                Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
-                Double longitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude"));
-                LatLng businessLocation = new LatLng(latitude, longitude);
-                BusinessDataModel businessDataModel = new BusinessDataModel();
-                businessDataModel.setName(name);
-                businessDataModel.setAddress(address);
-                addMarker(businessLocation, businessDataModel);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }
