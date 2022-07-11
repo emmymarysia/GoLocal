@@ -100,7 +100,6 @@ public class APICall extends AsyncTask<String, Void, String> {
             Response response = client.newCall(request).execute();
             results = response.body().string();
         } catch (IOException e) {
-            Log.e("autocomplete", "hellppppp", e);
             e.printStackTrace();
             return null;
         }
