@@ -51,6 +51,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         if (searchText.length() < 3) {
             return null;
         }
+        
         ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
         query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
