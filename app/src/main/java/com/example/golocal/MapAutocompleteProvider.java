@@ -35,7 +35,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapAutocompleteProvider extends ContentProvider {
+public class MapAutocompleteProvider extends ContentProvider implements OnTaskCompleted {
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -109,5 +109,10 @@ public class MapAutocompleteProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
+    }
+
+    @Override
+    public void onTaskCompleted() {
+
     }
 }
