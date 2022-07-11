@@ -235,6 +235,7 @@ public class MapFragment extends Fragment {
         for (int i = 0; i < results.length(); i++) {
             JSONObject business = results.getJSONObject(i);
             String address = business.getJSONObject("location").getString("address");
+            String foursquareId = business.getString("fsq_id");
             String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
             String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
             LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
@@ -245,6 +246,7 @@ public class MapFragment extends Fragment {
             BusinessDataModel currentBusiness = new BusinessDataModel();
             currentBusiness.setName(businessName);
             currentBusiness.setAddress(address);
+            currentBusiness.setFoursquareId(foursquareId);
             Marker mapMarker = map.addMarker(new MarkerOptions()
                     .position(markerPosition)
                     .title(businessName)
