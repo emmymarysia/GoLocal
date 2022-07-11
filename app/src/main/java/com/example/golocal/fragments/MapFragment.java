@@ -3,24 +3,50 @@ package com.example.golocal.fragments;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
+import com.example.golocal.models.BusinessDataModel;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class MapFragment extends Fragment {
@@ -30,6 +56,11 @@ public class MapFragment extends Fragment {
     private Location mCurrentLocation;
     private MainActivity mainActivity;
     private final static int CAMERA_ZOOM = 17;
+    private final static String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+    private final static String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
+    private OkHttpClient client = new OkHttpClient();
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+    private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -39,6 +70,33 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_map, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                SearchQueryCall call = new SearchQueryCall();
+                call.execute(query);
+                searchView.clearFocus();
+                map.clear();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() >= 3) {
+                    AutocompleteCall call = new AutocompleteCall();
+                    call.execute(newText);
+                }
+                return false;
+            }
+        });
     }
 
     @Nullable
@@ -81,6 +139,20 @@ public class MapFragment extends Fragment {
         } else {
             Toast.makeText(mainActivity, "Map is null", Toast.LENGTH_SHORT).show();
         }
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                String title = marker.getTitle();
+                String address = marker.getSnippet();
+                BusinessDataModel clickedBusiness = queryResultBusinesses.get(marker);
+                BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(clickedBusiness);
+                FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flContainer, businessDetailFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+                return false;
+            }
+        });
     }
 
 
@@ -89,6 +161,99 @@ public class MapFragment extends Fragment {
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, CAMERA_ZOOM);
             map.animateCamera(cameraUpdate);
+        }
+    }
+
+    private class AutocompleteCall extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            Double latitude = mCurrentLocation.getLatitude();
+            Double longitude = mCurrentLocation.getLongitude();
+            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
+            Request request = new Request.Builder()
+                    .url(AUTOCOMPLETE_URL + params[0] + "&ll=" + latlng)
+                    .get()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
+                    .build();
+
+            Response response;
+            String results;
+            try {
+                response = client.newCall(request).execute();
+                results = response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return results;
+        }
+    }
+
+    private class SearchQueryCall extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            Double latitude = mCurrentLocation.getLatitude();
+            Double longitude = mCurrentLocation.getLongitude();
+            String latlng = df.format(latitude) + "%2C" + df.format(longitude);
+            Request request = new Request.Builder()
+                    .url(SEARCH_URL + params[0] + "&ll=" + latlng + "&exclude_all_chains=true")
+                    .get()
+                    .addHeader("Accept", "application/json")
+                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
+                    .build();
+
+
+            Response response;
+            String results;
+            try {
+                response = client.newCall(request).execute();
+                results = response.body().string();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+            return results;
+        }
+
+        protected void onPostExecute(String results) {
+            try {
+                queryResultsFromJson(results);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void queryResultsFromJson(String data) throws JSONException {
+        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+        JSONObject queryResponse = new JSONObject(data);
+        LatLng mapCenter = null;
+        JSONArray results = queryResponse.getJSONArray("results");
+        queryResultBusinesses.clear();
+        for (int i = 0; i < results.length(); i++) {
+            JSONObject business = results.getJSONObject(i);
+            String address = business.getJSONObject("location").getString("address");
+            String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
+            String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
+            LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+            if (i == 0) {
+                mapCenter = markerPosition;
+            }
+            String businessName = business.getString("name");
+            BusinessDataModel currentBusiness = new BusinessDataModel();
+            currentBusiness.setName(businessName);
+            currentBusiness.setAddress(address);
+            Marker mapMarker = map.addMarker(new MarkerOptions()
+                    .position(markerPosition)
+                    .title(businessName)
+                    .snippet(address)
+                    .icon(defaultMarker));
+            queryResultBusinesses.put(mapMarker, currentBusiness);
+        }
+        if (mapCenter != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
         }
     }
 }
