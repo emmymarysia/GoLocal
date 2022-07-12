@@ -2,6 +2,7 @@ package com.example.golocal.AsyncTasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -89,6 +90,7 @@ public class PlacesAPICall extends AsyncTask<String, Void, String> {
     }
 
     private void postExecuteFromMapFragment(String results) throws JSONException {
+        Log.e("results", results);
         JSONObject jsonResults = new JSONObject(results);
         String name = jsonResults.getString("name");
         String address = jsonResults.getJSONObject("location").getString("address");

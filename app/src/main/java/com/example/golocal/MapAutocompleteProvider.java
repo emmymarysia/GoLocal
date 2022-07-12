@@ -27,12 +27,14 @@ import com.example.golocal.models.BusinessDataModel;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.json.JSONException;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MapAutocompleteProvider extends ContentProvider implements OnTaskCompleted {
+public class MapAutocompleteProvider extends ContentProvider {
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -69,12 +71,18 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
                 userLocation = df.format(latitude) + "%2C" + df.format(longitude);
             }
         }
-        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
+        String result = "";
+        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID});
         try {
-            call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
+            result += call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            call.queryAutocompleteResultsFromJson(result);
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         resultBusinesses.addAll(call.autocompleteResults.getResultBusinesses());
@@ -82,6 +90,7 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
             for (int i = 0; i < resultBusinesses.size(); i++) {
                 BusinessDataModel searchSuggestion = resultBusinesses.get(i);
                 String id = searchSuggestion.getFoursquareId();
+                Log.e("id", id);
                 cursor.newRow()
                         .add(BaseColumns._ID, i)
                         .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())
@@ -111,10 +120,5 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
-    }
-
-    @Override
-    public void onTaskCompleted() {
-
     }
 }

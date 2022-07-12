@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,12 +70,14 @@ public class MapFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
+            Log.e("bus", intent.getData().toString());
             call.setMapFragment(this);
             call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_MAP_FRAGMENT);
         }
     }
 
     public void addMarker(LatLng markerPosition, BusinessDataModel businessDataModel) {
+        Log.e("map", "entered here!!!");
         BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
         Marker mapMarker = map.addMarker(new MarkerOptions()
                 .position(markerPosition)
