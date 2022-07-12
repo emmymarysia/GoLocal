@@ -50,10 +50,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         if (searchText.length() < 3) {
             return null;
         }
-        boolean thread = Looper.myLooper() == Looper.getMainLooper();
-        Log.e("MapAutocomplete", String.valueOf(thread));
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
-        query.whereEqualTo("queryText", searchText);
+
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         SearchAndAutocompleteAPICall call = new SearchAndAutocompleteAPICall();
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
@@ -74,7 +71,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         String result = "";
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID});
         try {
-            result += call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
+            result = call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -90,7 +87,6 @@ public class MapAutocompleteProvider extends ContentProvider {
             for (int i = 0; i < resultBusinesses.size(); i++) {
                 BusinessDataModel searchSuggestion = resultBusinesses.get(i);
                 String id = searchSuggestion.getFoursquareId();
-                Log.e("id", id);
                 cursor.newRow()
                         .add(BaseColumns._ID, i)
                         .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())

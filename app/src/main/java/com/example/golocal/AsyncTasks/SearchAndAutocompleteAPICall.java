@@ -47,7 +47,6 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
     private GoogleMap map;
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
-    private MapAutocompleteProvider provider = new MapAutocompleteProvider();
     public AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
 
     @Override
@@ -64,7 +63,6 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
         } else if (requestType.equals("searchQuery")) {
             results = makeApiRequest(SEARCH_URL + params[0] + "&ll=" + userLocation + "&exclude_all_chains=true");
         }
-
         return results;
     }
 
@@ -107,10 +105,6 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
 
     public void setGoogleMap(GoogleMap map) {
         this.map = map;
-    }
-
-    public HashMap<Marker, BusinessDataModel> getQueryResultBusinesses() {
-        return queryResultBusinesses;
     }
 
     public void setMapFragment(MapFragment mapFragment) {
