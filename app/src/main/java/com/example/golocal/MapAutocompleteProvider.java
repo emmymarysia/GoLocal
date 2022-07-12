@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationRequest;
 import android.net.Uri;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
 
@@ -34,6 +35,7 @@ import com.parse.ParseQuery;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MapAutocompleteProvider extends ContentProvider implements OnTaskCompleted {
 
@@ -51,7 +53,8 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
         if (searchText.length() < 3) {
             return null;
         }
-        
+        boolean thread = Looper.myLooper() == Looper.getMainLooper();
+        Log.e("MapAutocomplete", String.valueOf(thread));
         ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
         query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
@@ -71,10 +74,13 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
                 userLocation = df.format(latitude) + "%2C" + df.format(longitude);
             }
         }
-        call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete");
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
-        while (call.autocompleteResults.getResultBusinesses() == null) {
-            continue;
+        try {
+            call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         resultBusinesses.addAll(call.autocompleteResults.getResultBusinesses());
         if (resultBusinesses.size() > 0) {
