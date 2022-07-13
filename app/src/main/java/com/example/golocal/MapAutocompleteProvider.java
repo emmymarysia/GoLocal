@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.LocationRequest;
 import android.net.Uri;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -23,12 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.golocal.AsyncTasks.APICall;
-import com.example.golocal.activities.MainActivity;
-import com.example.golocal.models.AutocompleteResultDataModel;
+import com.example.golocal.AsyncTasks.AutocompleteAsyncCall;
 import com.example.golocal.models.BusinessDataModel;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
@@ -37,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MapAutocompleteProvider extends ContentProvider implements OnTaskCompleted {
+public class MapAutocompleteProvider extends ContentProvider {
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
@@ -53,12 +48,8 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
         if (searchText.length() < 3) {
             return null;
         }
-        boolean thread = Looper.myLooper() == Looper.getMainLooper();
-        Log.e("MapAutocomplete", String.valueOf(thread));
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("AutocompleteResults");
-        query.whereEqualTo("queryText", searchText);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
-        APICall call = new APICall();
+        AutocompleteAsyncCall call = new AutocompleteAsyncCall();
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
@@ -76,7 +67,7 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
         }
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
         try {
-            call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key), "autocomplete").get();
+            call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key)).get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -116,10 +107,5 @@ public class MapAutocompleteProvider extends ContentProvider implements OnTaskCo
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
-    }
-
-    @Override
-    public void onTaskCompleted() {
-
     }
 }
