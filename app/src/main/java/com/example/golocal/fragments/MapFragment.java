@@ -41,9 +41,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
-import okhttp3.OkHttpClient;
-
-
 public class MapFragment extends Fragment {
 
     public static final int CAMERA_ZOOM = 17;

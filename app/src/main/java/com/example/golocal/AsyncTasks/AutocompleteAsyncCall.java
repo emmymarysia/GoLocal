@@ -97,12 +97,18 @@ public class AutocompleteAsyncCall extends AsyncTask<String, Void, String> {
         JSONArray results = autocompleteResponse.getJSONArray("results");
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         for (int i = 0; i < results.length(); i++) {
-            BusinessDataModel business = new BusinessDataModel();
             JSONObject recommendation = results.getJSONObject(i);
-            JSONObject text = recommendation.getJSONObject("text");
-            String primaryText = text.getString("primary");
-            business.setName(primaryText);
-            resultBusinesses.add(business);
+            String type = recommendation.getString("type");
+            if (type.equals("place")) {
+                BusinessDataModel business = new BusinessDataModel();
+                JSONObject text = recommendation.getJSONObject("text");
+                JSONObject place = recommendation.getJSONObject("place");
+                String primaryText = text.getString("primary");
+                String foursquareId = place.getString("fsq_id");
+                business.setFoursquareId(foursquareId);
+                business.setName(primaryText);
+                resultBusinesses.add(business);
+            }
         }
         autocompleteResults.setResultBusinesses(resultBusinesses);
         autocompleteResults.setQueryText(searchText);
