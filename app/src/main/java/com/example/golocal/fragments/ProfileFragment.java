@@ -55,7 +55,8 @@ public class ProfileFragment extends Fragment {
     private final String photoFileName = "photo.jpg";
 
     private final String KEY_BIO = "bio";
-    private final String KEY_IMAGE = "profileImage";
+    private static final String KEY_IMAGE = "profileImage";
+    private static final String KEY_FRIENDS = "friends";
     private final String TAG = "ProfileFragment";
 
     private TextView tvUsername;
@@ -126,7 +127,7 @@ public class ProfileFragment extends Fragment {
         ibAddFriend = view.findViewById(R.id.ibAddFriend);
         ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
 
-        List<ParseUser> friends = ParseUser.getCurrentUser().getList("friends");
+        List<ParseUser> friends = ParseUser.getCurrentUser().getList(KEY_FRIENDS);
         if (friends != null) {
             for (int i = 0; i < friends.size(); i++) {
                 String id = friends.get(i).getObjectId();
@@ -141,9 +142,6 @@ public class ProfileFragment extends Fragment {
             setAddFriendListener();
             setRemoveFriendListener();
             if (!friendIds.contains(user.getObjectId())) {
-                for (int i = 0; i < friends.size(); i++) {
-                    Log.e("friend", friends.get(i).getObjectId());
-                }
                 ibAddFriend.setVisibility(View.VISIBLE);
             } else {
                 ibRemoveFriend.setVisibility(View.VISIBLE);
@@ -208,19 +206,18 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                List<ParseUser> friends = currentUser.getList("friends");
+                List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
                 if (friends == null) {
                     friends = new ArrayList<>();
                 }
                 friends.add(user);
                 friendIds.add(user.getObjectId());
-                currentUser.put("friends", friends);
-                Log.e("friends", friends.toString());
+                currentUser.put(KEY_FRIENDS, friends);
                 currentUser.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
-                            Log.e("ProfileFragment", "error while saving friends", e);
+                            Log.e(TAG, "error while saving friends", e);
                         }
                     }
                 });
@@ -236,7 +233,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                List<ParseUser> friends = currentUser.getList("friends");
+                List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
                 if (friends == null) {
                     friends = new ArrayList<>();
                 }
@@ -246,13 +243,12 @@ public class ProfileFragment extends Fragment {
                     }
                 }
                 friendIds.remove(user.getObjectId());
-                currentUser.put("friends", friends);
-                Log.e("friends", friends.toString());
+                currentUser.put(KEY_FRIENDS, friends);
                 currentUser.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         if (e != null) {
-                            Log.e("ProfileFragment", "error while saving friends", e);
+                            Log.e(TAG, "error while saving friends", e);
                         }
                     }
                 });
