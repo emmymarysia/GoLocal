@@ -9,10 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.golocal.R;
+import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.BusinessAdapter;
 import com.example.golocal.models.GuideDataModel;
 
@@ -24,9 +26,11 @@ public class GuideDetailFragment extends Fragment {
     private TextView tvDescriptionDetail;
     private RecyclerView rvBusinessesDetail;
     private BusinessAdapter adapter;
+    private MainActivity mainActivity;
 
-    public GuideDetailFragment(GuideDataModel guideDataModel) {
+    public GuideDetailFragment(GuideDataModel guideDataModel, MainActivity main) {
         this.guideDataModel = guideDataModel;
+        this.mainActivity = main;
     }
 
     @Nullable
@@ -50,5 +54,15 @@ public class GuideDetailFragment extends Fragment {
         tvDescriptionDetail.setText(guideDataModel.getDescription());
         rvBusinessesDetail.setAdapter(adapter);
         rvBusinessesDetail.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        tvAuthorDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFragment profileFragment = new ProfileFragment(guideDataModel.getAuthor());
+                FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, profileFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
     }
 }
