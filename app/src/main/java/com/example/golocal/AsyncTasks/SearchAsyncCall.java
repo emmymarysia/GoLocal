@@ -1,12 +1,8 @@
 package com.example.golocal.AsyncTasks;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.example.golocal.MapAutocompleteProvider;
-import com.example.golocal.R;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.models.AutocompleteResultDataModel;
 import com.example.golocal.models.BusinessDataModel;
@@ -17,24 +13,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.SaveCallback;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String> {
-
-    private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+public class SearchAsyncCall extends AsyncTask<String, Void, String> {
     private static final String SEARCH_URL = "https://api.foursquare.com/v3/places/search?query=";
     private static final int CAMERA_ZOOM = 17;
     private final BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
@@ -43,7 +34,6 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
     private String searchText;
     private String userLocation;
     private String apiKey;
-    private String requestType;
     private GoogleMap map;
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
@@ -54,35 +44,20 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
         searchText = params[0];
         userLocation = params[1];
         apiKey = params[2];
-        requestType = params[3];
 
-        String results = "";
-
-        if (requestType.equals("autocomplete")) {
-            results = makeApiRequest(AUTOCOMPLETE_URL + searchText + "&ll=" + userLocation);
-        } else if (requestType.equals("searchQuery")) {
-            results = makeApiRequest(SEARCH_URL + params[0] + "&ll=" + userLocation + "&exclude_all_chains=true");
-        }
+        String results = makeApiRequest(SEARCH_URL + params[0] + "&ll=" + userLocation + "&exclude_all_chains=true");
         return results;
     }
 
     protected void onPostExecute(String results) {
-        if (requestType.equals("searchQuery")) {
-            try {
-                queryResultsFromJson(results);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } else if (requestType.equals("autocomplete")) {
-            try {
-                queryAutocompleteResultsFromJson(results);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        try {
+            queryResultsFromJson(results);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
-    public String makeApiRequest(String url) {
+    private String makeApiRequest(String url) {
         Request request = new Request.Builder()
                 .url(url)
                 .get()
@@ -99,16 +74,7 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
             e.printStackTrace();
             return null;
         }
-
         return results;
-    }
-
-    public void setGoogleMap(GoogleMap map) {
-        this.map = map;
-    }
-
-    public void setMapFragment(MapFragment mapFragment) {
-        this.mapFragment = mapFragment;
     }
 
     public void queryResultsFromJson(String data) throws JSONException {
@@ -130,31 +96,6 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
         // set the results hashmap back in the mapFragment
         mapFragment.queryResultBusinesses.clear();
         mapFragment.queryResultBusinesses.putAll(this.queryResultBusinesses);
-    }
-
-    public void queryAutocompleteResultsFromJson(String data) throws JSONException {
-        if (data == null) {
-            return;
-        }
-        JSONObject autocompleteResponse = new JSONObject(data);
-        JSONArray results = autocompleteResponse.getJSONArray("results");
-        ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
-        for (int i = 0; i < results.length(); i++) {
-            JSONObject recommendation = results.getJSONObject(i);
-            String type = recommendation.getString("type");
-            if (type.equals("place")) {
-                BusinessDataModel business = new BusinessDataModel();
-                JSONObject text = recommendation.getJSONObject("text");
-                JSONObject place = recommendation.getJSONObject("place");
-                String primaryText = text.getString("primary");
-                String foursquareId = place.getString("fsq_id");
-                business.setFoursquareId(foursquareId);
-                business.setName(primaryText);
-                resultBusinesses.add(business);
-            }
-        }
-        autocompleteResults.setResultBusinesses(resultBusinesses);
-        autocompleteResults.setQueryText(searchText);
     }
 
     public LatLng createBusinessModelFromJson(JSONObject business) throws JSONException {
@@ -179,5 +120,13 @@ public class SearchAndAutocompleteAPICall extends AsyncTask<String, Void, String
                 .snippet(address)
                 .icon(defaultMarker));
         queryResultBusinesses.put(mapMarker, currentBusiness);
+    }
+
+    public void setMapFragment(MapFragment mapFragment) {
+        this.mapFragment = mapFragment;
+    }
+
+    public void setGoogleMap(GoogleMap map) {
+        this.map = map;
     }
 }

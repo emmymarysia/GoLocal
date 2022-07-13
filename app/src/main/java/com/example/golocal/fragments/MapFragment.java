@@ -23,7 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.golocal.AsyncTasks.PlacesAPICall;
-import com.example.golocal.AsyncTasks.SearchAndAutocompleteAPICall;
+import com.example.golocal.AsyncTasks.SearchAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -98,10 +98,10 @@ public class MapFragment extends Fragment {
                 Double latitude = mCurrentLocation.getLatitude();
                 Double longitude = mCurrentLocation.getLongitude();
                 String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                SearchAndAutocompleteAPICall call = new SearchAndAutocompleteAPICall();
+                SearchAsyncCall call = new SearchAsyncCall();
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
-                call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
+                call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key));
                 searchView.clearFocus();
                 map.clear();
                 return true;

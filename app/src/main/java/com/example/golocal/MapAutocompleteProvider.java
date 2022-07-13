@@ -22,7 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.golocal.AsyncTasks.SearchAndAutocompleteAPICall;
+import com.example.golocal.AsyncTasks.AutocompleteAsyncCall;
 import com.example.golocal.models.BusinessDataModel;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -50,9 +50,8 @@ public class MapAutocompleteProvider extends ContentProvider {
         if (searchText.length() < 3) {
             return null;
         }
-
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
-        SearchAndAutocompleteAPICall call = new SearchAndAutocompleteAPICall();
+        AutocompleteAsyncCall call = new AutocompleteAsyncCall();
         LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
         if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
