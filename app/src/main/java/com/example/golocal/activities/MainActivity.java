@@ -13,13 +13,17 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.golocal.PriorityQueue;
+import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.fragments.GuidesFragment;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.fragments.ProfileFragment;
 import com.example.golocal.R;
 import com.example.golocal.models.BusinessDataModel;
+import com.example.golocal.models.GuideDataModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -106,5 +110,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_map);
+
+        PriorityQueue p = new PriorityQueue();
+        PriorityQueueNode a = new PriorityQueueNode(new GuideDataModel(), 5);
+        p.insert(a);
+        PriorityQueueNode b = new PriorityQueueNode(new GuideDataModel(), 3);
+        p.insert(b);
+        PriorityQueueNode c = new PriorityQueueNode(new GuideDataModel(), 10);
+        p.insert(c);
+        PriorityQueueNode d = new PriorityQueueNode(new GuideDataModel(), 2);
+        p.insert(d);
+        PriorityQueueNode e = new PriorityQueueNode(new GuideDataModel(), 2);
+        p.insert(e);
+        PriorityQueueNode f = new PriorityQueueNode(new GuideDataModel(), 20);
+        p.insert(f);
+        Log.e("queue", p.toString());
+        p.remove();
+        Log.e("queue", p.toString());
     }
 }
