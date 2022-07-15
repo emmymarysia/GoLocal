@@ -22,7 +22,7 @@ public class PriorityQueueNode {
     }
 
     private void assignPriority() {
-        // compare user location, if it's written by a friend, and if it was published recently
+        // TODO: add guide creation to the priority function
         this.priority = 0;
         String guideLocation = this.guideDataModel.getLocation();
         ParseUser guideAuthor = this.guideDataModel.getAuthor();

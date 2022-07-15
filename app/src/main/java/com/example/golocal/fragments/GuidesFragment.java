@@ -21,14 +21,11 @@ import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.GuidesAdapter;
-import com.example.golocal.fragments.CreateGuideFragment;
 import com.example.golocal.models.GuideDataModel;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class GuidesFragment extends Fragment {
@@ -75,16 +72,14 @@ public class GuidesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         rvGuides = view.findViewById(R.id.rvGuides);
-        context = getContext();
         adapter = new GuidesAdapter(context, guidesPriorityQueue, mainActivity);
+        context = getContext();
         rvGuides.setAdapter(adapter);
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
         queryGuides();
     }
-
-    // TODO: change this so that it doesn't just show all guides
+    
     public void queryGuides() {
         ParseQuery<GuideDataModel> query = ParseQuery.getQuery(GuideDataModel.class);
         query.include(GuideDataModel.KEY_AUTHOR);
@@ -99,6 +94,7 @@ public class GuidesFragment extends Fragment {
                     PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
                     guidesPriorityQueue.insert(currentGuide);
                 }
+                adapter.addAll(guidesPriorityQueue.getNodesInOrder());
                 adapter.notifyDataSetChanged();
             }
         });

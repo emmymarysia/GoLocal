@@ -39,6 +39,9 @@ public class PriorityQueue {
 
     private void fixHeap() {
         int nodeIndex = 0;
+        if (maxHeap.size() == 0) {
+            return;
+        }
         int nodePriority = maxHeap.get(0).getPriority();
         while (getLeftChild(nodeIndex) != null || getRightChild(nodeIndex) != null) {
             PriorityQueueNode leftChild = getLeftChild(nodeIndex);
@@ -131,5 +134,14 @@ public class PriorityQueue {
 
     public void clear() {
         maxHeap.clear();
+    }
+
+    public ArrayList<PriorityQueueNode> getNodesInOrder() {
+        ArrayList<PriorityQueueNode> guides = new ArrayList<>();
+        while (maxHeap.size() > 0) {
+            PriorityQueueNode nextNode = remove();
+            guides.add(nextNode);
+        }
+        return guides;
     }
 }

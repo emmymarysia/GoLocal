@@ -32,23 +32,24 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     public GuidesAdapter(Context context, PriorityQueue guidesPriorityQueue, MainActivity main) {
         this.context = context;
         this.guidesPriorityQueue = guidesPriorityQueue;
-        for (int i = 0; i < guidesPriorityQueue.size(); i++) {
-            addedGuides.add(guidesPriorityQueue.remove());
-        }
         mainActivity = main;
+    }
+
+    public void addAll(ArrayList<PriorityQueueNode> guidesInOrder) {
+        this.addedGuides.addAll(guidesInOrder);
+        this.notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public GuidesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_guide, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_guide, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GuidesAdapter.ViewHolder holder, int position) {
         GuideDataModel guideDataModel = addedGuides.get(position).getGuideDataModel();
-        Log.e("adding guide", guideDataModel.getTitle());
         holder.bind(guideDataModel);
     }
 
