@@ -110,22 +110,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_map);
-
-        PriorityQueue p = new PriorityQueue();
-        PriorityQueueNode a = new PriorityQueueNode(new GuideDataModel(), 5);
-        p.insert(a);
-        PriorityQueueNode b = new PriorityQueueNode(new GuideDataModel(), 3);
-        p.insert(b);
-        PriorityQueueNode c = new PriorityQueueNode(new GuideDataModel(), 10);
-        p.insert(c);
-        PriorityQueueNode d = new PriorityQueueNode(new GuideDataModel(), 2);
-        p.insert(d);
-        PriorityQueueNode e = new PriorityQueueNode(new GuideDataModel(), 2);
-        p.insert(e);
-        PriorityQueueNode f = new PriorityQueueNode(new GuideDataModel(), 20);
-        p.insert(f);
-        Log.e("queue", p.toString());
-        p.remove();
-        Log.e("queue", p.toString());
     }
 }
