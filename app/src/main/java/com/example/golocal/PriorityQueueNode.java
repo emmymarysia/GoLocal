@@ -1,6 +1,10 @@
 package com.example.golocal;
 
+import android.util.Log;
+
 import com.example.golocal.models.GuideDataModel;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.Date;
@@ -28,7 +32,13 @@ public class PriorityQueueNode {
         String userLocation = currentUser.getString(KEY_LOCATION);
         List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
         for (ParseUser friend: friends) {
-            if (guideAuthorUsername.equals(friend.getUsername())) {
+            String friendUsername = "";
+            try {
+                friendUsername = friend.fetchIfNeeded().getString("username");
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (guideAuthorUsername.equals(friendUsername)) {
                 priority += 2;
             }
         }
@@ -39,5 +49,9 @@ public class PriorityQueueNode {
 
     public int getPriority() {
         return this.priority;
+    }
+
+    public GuideDataModel getGuideDataModel() {
+        return this.guideDataModel;
     }
 }

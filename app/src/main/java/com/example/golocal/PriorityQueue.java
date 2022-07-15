@@ -124,4 +124,12 @@ public class PriorityQueue {
         }
         return toString;
     }
+
+    public int size() {
+        return this.maxHeap.size();
+    }
+
+    public void clear() {
+        maxHeap.clear();
+    }
 }
