@@ -79,7 +79,7 @@ public class GuidesFragment extends Fragment {
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
         queryGuides();
     }
-    
+
     public void queryGuides() {
         ParseQuery<GuideDataModel> query = ParseQuery.getQuery(GuideDataModel.class);
         query.include(GuideDataModel.KEY_AUTHOR);
