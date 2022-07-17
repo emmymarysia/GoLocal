@@ -57,6 +57,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         }
         List<String> providers = locationManager.getProviders(true);
         String userLocation = "";
+        // loop through all location providers to see if any can provide the user's current location
         for (int i = providers.size()-1; i >= 0; i--) {
             Location currentLocation = locationManager.getLastKnownLocation(providers.get(i));
             if (currentLocation != null) {
@@ -67,7 +68,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         }
         MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
         try {
-            call.execute(searchText, userLocation,getContext().getResources().getString(R.string.foursquare_api_key)).get();
+            call.execute(searchText, userLocation, getContext().getResources().getString(R.string.foursquare_api_key)).get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
