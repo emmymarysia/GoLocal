@@ -2,10 +2,10 @@ package com.example.golocal.fragments;
 
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,12 +18,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.golocal.AsyncTasks.AutocompleteCall;
-import com.example.golocal.DBHandler;
+import com.example.golocal.AsyncTasks.AutocompleteAsyncCall;
+import com.example.golocal.AsyncTasks.SearchAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.models.BusinessDataModel;
@@ -32,24 +31,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class MapFragment extends Fragment {
@@ -61,9 +48,9 @@ public class MapFragment extends Fragment {
     private GoogleMap map;
     private Location mCurrentLocation;
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
+    public ArrayList<BusinessDataModel> autocompleteResults = new ArrayList<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
-    public DBHandler dbHandler;
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -73,7 +60,6 @@ public class MapFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dbHandler = new DBHandler(getContext());
         setHasOptionsMenu(true);
     }
 
@@ -81,17 +67,19 @@ public class MapFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_map, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        SearchManager searchManager = (SearchManager) mainActivity.getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(mainActivity.getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 Double latitude = mCurrentLocation.getLatitude();
                 Double longitude = mCurrentLocation.getLongitude();
                 String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                AutocompleteCall call = new AutocompleteCall();
+                SearchAsyncCall call = new SearchAsyncCall();
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
-                call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key), "searchQuery");
+                call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key));
                 searchView.clearFocus();
                 map.clear();
                 return true;
@@ -99,18 +87,12 @@ public class MapFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() >= 3) {
-                    Double latitude = mCurrentLocation.getLatitude();
-                    Double longitude = mCurrentLocation.getLongitude();
-                    String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                    AutocompleteCall call = new AutocompleteCall();
-                    call.setMapFragment(MapFragment.this);
-                    call.execute(newText, userLocation, getResources().getString(R.string.foursquare_api_key), "autocomplete");
-                }
+                // TODO: implement checking for intent and action if a suggestion is clicked
                 return false;
             }
         });
     }
+
 
     @Nullable
     @Override
@@ -126,7 +108,7 @@ public class MapFragment extends Fragment {
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                // TODO: implement going to filter fragment
             }
         });
     }

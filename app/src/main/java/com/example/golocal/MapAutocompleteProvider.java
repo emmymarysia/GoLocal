@@ -1,23 +1,91 @@
 package com.example.golocal;
 
+import static android.content.Context.LOCATION_SERVICE;
+
+import android.Manifest;
+import android.app.Activity;
+import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Looper;
+import android.provider.BaseColumns;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.example.golocal.AsyncTasks.AutocompleteAsyncCall;
+import com.example.golocal.models.BusinessDataModel;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MapAutocompleteProvider extends ContentProvider {
+
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+
     @Override
     public boolean onCreate() {
-        return false;
+        return true;
     }
 
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        return null;
+        String searchText = selectionArgs[0];
+        if (searchText.length() < 3) {
+            return null;
+        }
+        ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
+        AutocompleteAsyncCall call = new AutocompleteAsyncCall();
+        LocationManager locationManager = (LocationManager) getContext().getSystemService(LOCATION_SERVICE);
+        if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions((Activity) getContext(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+        List<String> providers = locationManager.getProviders(true);
+        String userLocation = "";
+        // loop through all location providers to see if any can provide the user's current location
+        for (int i = providers.size()-1; i >= 0; i--) {
+            Location currentLocation = locationManager.getLastKnownLocation(providers.get(i));
+            if (currentLocation != null) {
+                Double latitude = currentLocation.getLatitude();
+                Double longitude = currentLocation.getLongitude();
+                userLocation = df.format(latitude) + "%2C" + df.format(longitude);
+            }
+        }
+        MatrixCursor cursor = new MatrixCursor(new String[] { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
+        try {
+            call.execute(searchText, userLocation, getContext().getResources().getString(R.string.foursquare_api_key)).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        resultBusinesses.addAll(call.autocompleteResults.getResultBusinesses());
+        if (resultBusinesses.size() > 0) {
+            for (int i = 0; i < resultBusinesses.size(); i++) {
+                BusinessDataModel searchSuggestion = resultBusinesses.get(i);
+                String id = searchSuggestion.getFoursquareId();
+                cursor.newRow()
+                        .add(BaseColumns._ID, i)
+                        .add(SearchManager.SUGGEST_COLUMN_TEXT_1, searchSuggestion.getName())
+                        .add(SearchManager.SUGGEST_COLUMN_INTENT_DATA, id);
+            }
+        }
+        return cursor;
     }
 
     @Nullable
