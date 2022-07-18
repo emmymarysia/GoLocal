@@ -16,17 +16,16 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.golocal.PriorityQueue;
+import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.GuidesAdapter;
-import com.example.golocal.fragments.CreateGuideFragment;
 import com.example.golocal.models.GuideDataModel;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class GuidesFragment extends Fragment {
@@ -34,7 +33,7 @@ public class GuidesFragment extends Fragment {
     private final String TAG = "GuidesFragment";
 
     private RecyclerView rvGuides;
-    private List<GuideDataModel> guideDataModels;
+    private PriorityQueue guidesPriorityQueue = new PriorityQueue();
     public GuidesAdapter adapter;
     private Context context;
     private MainActivity mainActivity;
@@ -73,11 +72,9 @@ public class GuidesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         rvGuides = view.findViewById(R.id.rvGuides);
-        guideDataModels = new ArrayList<>();
+        adapter = new GuidesAdapter(context, guidesPriorityQueue, mainActivity);
         context = getContext();
-        adapter = new GuidesAdapter(context, guideDataModels, mainActivity);
         rvGuides.setAdapter(adapter);
         rvGuides.setLayoutManager(new LinearLayoutManager(context));
         queryGuides();
@@ -93,8 +90,11 @@ public class GuidesFragment extends Fragment {
                     Log.e(TAG, "Issue getting posts", e);
                     return;
                 }
-                guideDataModels.addAll(guidesList);
-                Collections.reverse(guideDataModels);
+                for (GuideDataModel guide: guidesList) {
+                    PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
+                    guidesPriorityQueue.insert(currentGuide);
+                }
+                adapter.addAll(guidesPriorityQueue.getNodesInOrder());
                 adapter.notifyDataSetChanged();
             }
         });

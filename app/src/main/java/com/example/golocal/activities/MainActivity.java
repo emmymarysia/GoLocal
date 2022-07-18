@@ -13,13 +13,17 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.golocal.PriorityQueue;
+import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.fragments.GuidesFragment;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.fragments.ProfileFragment;
 import com.example.golocal.R;
 import com.example.golocal.models.BusinessDataModel;
+import com.example.golocal.models.GuideDataModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
