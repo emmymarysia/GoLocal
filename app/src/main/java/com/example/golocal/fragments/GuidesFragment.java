@@ -83,7 +83,6 @@ public class GuidesFragment extends Fragment {
         queryGuides();
     }
 
-    // TODO: change this so that it doesn't just show all guides
     public void queryGuides() {
         ParseQuery<GuideDataModel> query = ParseQuery.getQuery(GuideDataModel.class);
         query.include(GuideDataModel.KEY_AUTHOR);
