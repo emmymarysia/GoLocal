@@ -37,7 +37,6 @@ import com.bumptech.glide.request.target.Target;
 import com.example.golocal.R;
 import com.example.golocal.activities.LoginActivity;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -64,7 +63,7 @@ public class ProfileFragment extends Fragment {
     private TextView tvUsername;
     private TextView tvBio;
     private ImageView ivProfileImage;
-    private TextView tvEditBio;
+    private Button btEditBio;
     private EditText etBio;
     private Button btFinishEditBio;
     private ImageButton ibEditProfileImage;
@@ -120,7 +119,7 @@ public class ProfileFragment extends Fragment {
         tvUsername = view.findViewById(R.id.tvUsername);
         tvBio = view.findViewById(R.id.tvBio);
         ivProfileImage = view.findViewById(R.id.ivProfileImage);
-        tvEditBio = view.findViewById(R.id.tvEditBio);
+        btEditBio = view.findViewById(R.id.btEditBio);
         etBio = view.findViewById(R.id.etBio);
         btFinishEditBio = view.findViewById(R.id.btFinishEditBio);
         ibEditProfileImage = view.findViewById(R.id.ibEditProfileImage);
@@ -138,7 +137,7 @@ public class ProfileFragment extends Fragment {
         if (!user.hasSameId(ParseUser.getCurrentUser())) {
             // if the user is different from the current user, remove profile customization buttons
             ibEditProfileImage.setVisibility(View.GONE);
-            tvEditBio.setVisibility(View.GONE);
+            btEditBio.setVisibility(View.GONE);
             setAddFriendListener();
             setRemoveFriendListener();
             if (!friendIds.contains(user.getObjectId())) {
@@ -181,13 +180,13 @@ public class ProfileFragment extends Fragment {
         });
 
 
-        tvEditBio.setOnClickListener(new View.OnClickListener() {
+        btEditBio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tvBio.setVisibility(View.GONE);
                 etBio.setVisibility(View.VISIBLE);
                 etBio.setText(tvBio.getText().toString());
-                tvEditBio.setVisibility(View.GONE);
+                btEditBio.setVisibility(View.GONE);
                 btFinishEditBio.setVisibility(View.VISIBLE);
                 btFinishEditBio.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -204,7 +203,7 @@ public class ProfileFragment extends Fragment {
                         tvBio.setText(user.getString(KEY_BIO));
                         tvBio.setVisibility(View.VISIBLE);
                         etBio.setVisibility(View.GONE);
-                        tvEditBio.setVisibility(View.VISIBLE);
+                        btEditBio.setVisibility(View.VISIBLE);
                         btFinishEditBio.setVisibility(View.GONE);
                     }
                 });
