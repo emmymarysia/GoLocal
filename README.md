@@ -84,7 +84,7 @@ This app aims to connect people with local businesses and experiences. With the 
   - Detail view of a specific business
   - *Add a business to a trip plan*
   - *Post photos when you visit*
-  - Filter search
+  - *Filter search*
 - **Guides list**
   - Create a guideDataModel
   - Complete view of a specific guideDataModel when clicked
