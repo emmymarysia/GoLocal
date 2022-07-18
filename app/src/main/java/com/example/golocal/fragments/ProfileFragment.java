@@ -136,6 +136,7 @@ public class ProfileFragment extends Fragment {
         }
 
         if (!user.hasSameId(ParseUser.getCurrentUser())) {
+            // if the user is different from the current user, remove profile customization buttons
             ibEditProfileImage.setVisibility(View.GONE);
             tvEditBio.setVisibility(View.GONE);
             btChooseFromGallery.setVisibility(View.GONE);

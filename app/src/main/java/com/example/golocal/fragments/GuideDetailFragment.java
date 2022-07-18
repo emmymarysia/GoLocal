@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,11 +27,11 @@ public class GuideDetailFragment extends Fragment {
     private TextView tvDescriptionDetail;
     private RecyclerView rvBusinessesDetail;
     private BusinessAdapter adapter;
-    private MainActivity mainActivity;
+    private FragmentManager fragmentManager;
 
-    public GuideDetailFragment(GuideDataModel guideDataModel, MainActivity main) {
+    public GuideDetailFragment(GuideDataModel guideDataModel, FragmentManager fragmentManager) {
         this.guideDataModel = guideDataModel;
-        this.mainActivity = main;
+        this.fragmentManager = fragmentManager;
     }
 
     @Nullable
@@ -59,7 +60,7 @@ public class GuideDetailFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ProfileFragment profileFragment = new ProfileFragment(guideDataModel.getAuthor());
-                FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, profileFragment);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.flContainer, profileFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
