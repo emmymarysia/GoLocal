@@ -35,6 +35,12 @@ import okhttp3.Response;
 public class AutocompleteAsyncCall extends AsyncTask<String, Void, String> {
 
     private static final String AUTOCOMPLETE_URL = "https://api.foursquare.com/v3/autocomplete?query=";
+    private static final String KEY_RESULTS = "results";
+    private static final String KEY_TYPE = "type";
+    private static final String KEY_TEXT = "text";
+    private static final String KEY_PLACE = "place";
+    private static final String KEY_PRIMARY = "primary";
+    private static final String KEY_FSQID = "fsq_id";
 
     private OkHttpClient client = new OkHttpClient();
     private String searchText;
@@ -94,17 +100,17 @@ public class AutocompleteAsyncCall extends AsyncTask<String, Void, String> {
             return;
         }
         JSONObject autocompleteResponse = new JSONObject(data);
-        JSONArray results = autocompleteResponse.getJSONArray("results");
+        JSONArray results = autocompleteResponse.getJSONArray(KEY_RESULTS);
         ArrayList<BusinessDataModel> resultBusinesses = new ArrayList<>();
         for (int i = 0; i < results.length(); i++) {
             JSONObject recommendation = results.getJSONObject(i);
-            String type = recommendation.getString("type");
-            if (type.equals("place")) {
+            String type = recommendation.getString(KEY_TYPE);
+            if (type.equals(KEY_PLACE)) {
                 BusinessDataModel business = new BusinessDataModel();
-                JSONObject text = recommendation.getJSONObject("text");
-                JSONObject place = recommendation.getJSONObject("place");
-                String primaryText = text.getString("primary");
-                String foursquareId = place.getString("fsq_id");
+                JSONObject text = recommendation.getJSONObject(KEY_TEXT);
+                JSONObject place = recommendation.getJSONObject(KEY_PLACE);
+                String primaryText = text.getString(KEY_PRIMARY);
+                String foursquareId = place.getString(KEY_FSQID);
                 business.setFoursquareId(foursquareId);
                 business.setName(primaryText);
                 resultBusinesses.add(business);
