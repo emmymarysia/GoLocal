@@ -35,6 +35,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.golocal.R;
 import com.example.golocal.activities.LoginActivity;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -43,17 +44,19 @@ import com.parse.SaveCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
-
-    // hello
 
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     private static final int PICK_PHOTO_CODE = 1046;
     private final String photoFileName = "photo.jpg";
 
     private final String KEY_BIO = "bio";
-    private final String KEY_IMAGE = "profileImage";
+    private static final String KEY_IMAGE = "profileImage";
+    private static final String KEY_FRIENDS = "friends";
     private final String TAG = "ProfileFragment";
 
     private TextView tvUsername;
@@ -64,9 +67,12 @@ public class ProfileFragment extends Fragment {
     private Button btFinishEditBio;
     private ImageButton ibEditProfileImage;
     private Button btChooseFromGallery;
+    private ImageButton ibAddFriend;
+    private ImageButton ibRemoveFriend;
     private ParseUser user;
     private Context context;
     private File photoFile;
+    private HashSet<String> friendIds = new HashSet<>();
 
     public ProfileFragment(ParseUser currentUser) {
         user = currentUser;
@@ -118,6 +124,29 @@ public class ProfileFragment extends Fragment {
         btFinishEditBio = view.findViewById(R.id.btFinishEditBio);
         ibEditProfileImage = view.findViewById(R.id.ibEditProfileImage);
         btChooseFromGallery = view.findViewById(R.id.btChooseFromGallery);
+        ibAddFriend = view.findViewById(R.id.ibAddFriend);
+        ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
+
+        List<ParseUser> friends = ParseUser.getCurrentUser().getList(KEY_FRIENDS);
+        if (friends != null) {
+            for (int i = 0; i < friends.size(); i++) {
+                String id = friends.get(i).getObjectId();
+                friendIds.add(id);
+            }
+        }
+
+        if (!user.hasSameId(ParseUser.getCurrentUser())) {
+            ibEditProfileImage.setVisibility(View.GONE);
+            tvEditBio.setVisibility(View.GONE);
+            btChooseFromGallery.setVisibility(View.GONE);
+            setAddFriendListener();
+            setRemoveFriendListener();
+            if (!friendIds.contains(user.getObjectId())) {
+                ibAddFriend.setVisibility(View.VISIBLE);
+            } else {
+                ibRemoveFriend.setVisibility(View.VISIBLE);
+            }
+        }
 
         tvUsername.setText(user.getString("username"));
         tvBio.setText(user.getString("bio"));
@@ -170,7 +199,63 @@ public class ProfileFragment extends Fragment {
                 });
             }
         });
+    }
 
+    private void setAddFriendListener() {
+        ibAddFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
+                if (friends == null) {
+                    friends = new ArrayList<>();
+                }
+                friends.add(user);
+                friendIds.add(user.getObjectId());
+                currentUser.put(KEY_FRIENDS, friends);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error while saving friends", e);
+                        }
+                    }
+                });
+                ibAddFriend.setVisibility(View.GONE);
+                ibRemoveFriend.setVisibility(View.VISIBLE);
+                ibAddFriend.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void setRemoveFriendListener() {
+        ibRemoveFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
+                if (friends == null) {
+                    friends = new ArrayList<>();
+                }
+                for (int i = 0; i < friends.size(); i++) {
+                    if (friends.get(i).hasSameId(user)) {
+                        friends.remove(friends.get(i));
+                    }
+                }
+                friendIds.remove(user.getObjectId());
+                currentUser.put(KEY_FRIENDS, friends);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error while saving friends", e);
+                        }
+                    }
+                });
+                ibAddFriend.setVisibility(View.VISIBLE);
+                ibRemoveFriend.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void launchCamera() {
