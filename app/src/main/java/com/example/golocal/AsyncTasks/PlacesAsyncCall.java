@@ -30,7 +30,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class PlacesAPICall extends AsyncTask<String, Void, String> {
+public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
 
     private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
     public static final String FROM_MAP_FRAGMENT = "fromMapFragment";

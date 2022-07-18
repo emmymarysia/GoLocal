@@ -3,6 +3,7 @@ package com.example.golocal.fragments;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +36,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.golocal.R;
 import com.example.golocal.activities.LoginActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -66,7 +68,6 @@ public class ProfileFragment extends Fragment {
     private EditText etBio;
     private Button btFinishEditBio;
     private ImageButton ibEditProfileImage;
-    private Button btChooseFromGallery;
     private ImageButton ibAddFriend;
     private ImageButton ibRemoveFriend;
     private ParseUser user;
@@ -123,7 +124,6 @@ public class ProfileFragment extends Fragment {
         etBio = view.findViewById(R.id.etBio);
         btFinishEditBio = view.findViewById(R.id.btFinishEditBio);
         ibEditProfileImage = view.findViewById(R.id.ibEditProfileImage);
-        btChooseFromGallery = view.findViewById(R.id.btChooseFromGallery);
         ibAddFriend = view.findViewById(R.id.ibAddFriend);
         ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
 
@@ -139,7 +139,6 @@ public class ProfileFragment extends Fragment {
             // if the user is different from the current user, remove profile customization buttons
             ibEditProfileImage.setVisibility(View.GONE);
             tvEditBio.setVisibility(View.GONE);
-            btChooseFromGallery.setVisibility(View.GONE);
             setAddFriendListener();
             setRemoveFriendListener();
             if (!friendIds.contains(user.getObjectId())) {
@@ -160,16 +159,27 @@ public class ProfileFragment extends Fragment {
         ibEditProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchCamera();
+                CharSequence[] items = {"Select from gallery", "Take a new photo", "Cancel"};
+
+                new MaterialAlertDialogBuilder(context)
+                        .setTitle("Edit Profile Image").setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0:
+                                        onPickPhoto(getView());
+                                        break;
+                                    case 1:
+                                        launchCamera();
+                                        break;
+                                    case 2:
+                                        dialog.dismiss();
+                                }
+                            }
+                        }).show();
             }
         });
 
-        btChooseFromGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPickPhoto(v);
-            }
-        });
 
         tvEditBio.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,10 +1,8 @@
 package com.example.golocal.fragments;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
-import com.example.golocal.AsyncTasks.PlacesAPICall;
+import com.example.golocal.AsyncTasks.PlacesAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.models.BusinessDataModel;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class BusinessDetailFragment extends Fragment {
 
@@ -65,9 +54,9 @@ public class BusinessDetailFragment extends Fragment {
         tvBusinessAddress = view.findViewById(R.id.tvBusinessAddress);
         tvBusinessDescription = view.findViewById(R.id.tvBusinessDescription);
         ivBusinessImage = view.findViewById(R.id.ivBusinessImage);
-        PlacesAPICall call = new PlacesAPICall();
+        PlacesAsyncCall call = new PlacesAsyncCall();
         call.setViewFields(tvBusinessDescription, ivBusinessImage, screenWidth, getContext());
-        call.execute(foursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_DETAIL_FRAGMENT);
+        call.execute(foursquareId, getString(R.string.foursquare_api_key), PlacesAsyncCall.FROM_DETAIL_FRAGMENT);
 
         tvBusinessTitle.setText(businessDataModel.getName());
         tvBusinessAddress.setText(businessDataModel.getAddress());

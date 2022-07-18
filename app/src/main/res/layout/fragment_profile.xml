@@ -84,16 +84,6 @@
         app:layout_constraintTop_toBottomOf="@id/ivProfileImage"
         tools:srcCompat="@tools:sample/avatars" />
 
-    <Button
-        android:id="@+id/btChooseFromGallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:layout_marginTop="116dp"
-        android:text="Choose from gallery"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvBio" />
-
     <ImageButton
         android:id="@+id/ibAddFriend"
         android:layout_width="25dp"
