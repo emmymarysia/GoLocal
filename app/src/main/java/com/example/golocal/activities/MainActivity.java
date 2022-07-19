@@ -74,9 +74,9 @@ public class MainActivity extends AppCompatActivity {
                 currentLocation = location;
                 mapFragment.updateLocation(location);
             }
-
-
         });
+
+
 
         currentUser = ParseUser.getCurrentUser();
 

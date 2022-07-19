@@ -2,7 +2,9 @@ package com.example.golocal.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +22,10 @@ import com.example.golocal.fragments.GuideDetailFragment;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.R;
 import com.example.golocal.models.GuideDataModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +36,8 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     private PriorityQueue guidesPriorityQueue;
     private MainActivity mainActivity;
     private ArrayList<PriorityQueueNode> addedGuides = new ArrayList<>();
+    private final static String KEY_LIKED_GUIDES = "likedGuides";
+    private final static String TAG = "guidesAdapter";
 
     public GuidesAdapter(Context context, PriorityQueue guidesPriorityQueue, MainActivity main) {
         this.context = context;
@@ -42,6 +50,8 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         this.notifyDataSetChanged();
     }
 
+
+
     @NonNull
     @Override
     public GuidesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,6 +63,50 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull GuidesAdapter.ViewHolder holder, int position) {
         GuideDataModel guideDataModel = addedGuides.get(position).getGuideDataModel();
         holder.bind(guideDataModel);
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new MaterialAlertDialogBuilder(v.getContext())
+                        .setTitle(guideDataModel.getTitle())
+                        .setMessage(guideDataModel.getDescription())
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton("Favorite Guide", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ParseUser currentUser = ParseUser.getCurrentUser();
+                                List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
+                                if (likedGuides == null) {
+                                    likedGuides = new ArrayList<>();
+                                }
+                                boolean guideIsAlreadyLiked = false;
+                                for (GuideDataModel guide: likedGuides) {
+                                    if (guide.hasSameId(guideDataModel)) {
+                                        guideIsAlreadyLiked = true;
+                                    }
+                                }
+                                if (!guideIsAlreadyLiked) {
+                                    likedGuides.add(guideDataModel);
+                                }
+                                currentUser.put(KEY_LIKED_GUIDES, likedGuides);
+                                currentUser.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "Error saving user", e);
+                                        }
+                                    }
+                                });
+                            }
+                        })
+                        .show();
+                return false;
+            }
+        });
     }
 
     @Override
