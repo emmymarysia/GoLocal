@@ -15,6 +15,7 @@ public class GuideDataModel extends ParseObject {
     public static final String KEY_LIKEDBY = "likedBy";
     public static final String KEY_BUSINESSLIST = "businessList";
     public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_LOCATION = "location";
 
     public GuideDataModel() {}
 
@@ -56,5 +57,13 @@ public class GuideDataModel extends ParseObject {
 
     public void setDescription(String description) {
         put(KEY_DESCRIPTION, description);
+    }
+
+    public String getLocation() {
+        return getString(KEY_DESCRIPTION);
+    }
+
+    public void setLocation(String location) {
+        put(KEY_LOCATION, location);
     }
 }
