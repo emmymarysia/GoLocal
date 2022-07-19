@@ -157,7 +157,7 @@ public class PriorityQueue {
         }
     }
 
-    public void insertAllNodes(List<PriorityQueueNode> nodesList) {
+    private void insertAllNodes(List<PriorityQueueNode> nodesList) {
         for (PriorityQueueNode node: nodesList) {
             insert(node);
         }
