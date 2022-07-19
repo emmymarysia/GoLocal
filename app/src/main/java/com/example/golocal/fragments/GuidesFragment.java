@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.golocal.PriorityQueue;
-import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.GuidesAdapter;
@@ -26,6 +25,7 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GuidesFragment extends Fragment {
@@ -90,11 +90,13 @@ public class GuidesFragment extends Fragment {
                     Log.e(TAG, "Issue getting posts", e);
                     return;
                 }
-                for (GuideDataModel guide: guidesList) {
-                    PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
-                    guidesPriorityQueue.insert(currentGuide);
-                }
-                adapter.addAll(guidesPriorityQueue.getNodesInOrder());
+                adapter.clear();
+                guidesPriorityQueue.insertAllGuides(guidesList);
+
+                ArrayList<GuideDataModel> guidesInPriorityOrder = new ArrayList<>();
+                guidesInPriorityOrder.addAll(guidesPriorityQueue.getAllGuidesInOrder());
+
+                adapter.addAll(guidesInPriorityOrder);
                 adapter.notifyDataSetChanged();
             }
         });
