@@ -1,8 +1,9 @@
 package com.example.golocal;
 
-import android.util.Log;
+import com.example.golocal.models.GuideDataModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PriorityQueue {
     private ArrayList<PriorityQueueNode> maxHeap = new ArrayList<>();
@@ -137,12 +138,28 @@ public class PriorityQueue {
         maxHeap.clear();
     }
 
-    public ArrayList<PriorityQueueNode> getNodesInOrder() {
-        ArrayList<PriorityQueueNode> guides = new ArrayList<>();
+    public ArrayList<GuideDataModel> getAllGuidesInOrder() {
+        ArrayList<GuideDataModel> guides = new ArrayList<>();
+        ArrayList<PriorityQueueNode> nodes = new ArrayList<>();
         while (maxHeap.size() > 0) {
             PriorityQueueNode nextNode = remove();
-            guides.add(nextNode);
+            guides.add(nextNode.getGuideDataModel());
+            nodes.add(nextNode);
         }
+        insertAllNodes(nodes);
         return guides;
+    }
+
+    public void insertAllGuides(List<GuideDataModel> guidesList) {
+        for (GuideDataModel guide: guidesList) {
+            PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
+            insert(currentGuide);
+        }
+    }
+
+    public void insertAllNodes(List<PriorityQueueNode> nodesList) {
+        for (PriorityQueueNode node: nodesList) {
+            insert(node);
+        }
     }
 }

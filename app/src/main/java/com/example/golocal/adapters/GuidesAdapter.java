@@ -27,7 +27,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     private Context context;
     private PriorityQueue guidesPriorityQueue;
     private MainActivity mainActivity;
-    private ArrayList<PriorityQueueNode> addedGuides = new ArrayList<>();
+    private ArrayList<GuideDataModel> addedGuides = new ArrayList<>();
 
     public GuidesAdapter(Context context, PriorityQueue guidesPriorityQueue, MainActivity main) {
         this.context = context;
@@ -35,7 +35,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         mainActivity = main;
     }
 
-    public void addAll(ArrayList<PriorityQueueNode> guidesInOrder) {
+    public void addAll(ArrayList<GuideDataModel> guidesInOrder) {
         this.addedGuides.addAll(guidesInOrder);
         this.notifyDataSetChanged();
     }
@@ -49,7 +49,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull GuidesAdapter.ViewHolder holder, int position) {
-        GuideDataModel guideDataModel = addedGuides.get(position).getGuideDataModel();
+        GuideDataModel guideDataModel = addedGuides.get(position);
         holder.bind(guideDataModel);
     }
 
@@ -87,7 +87,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         public void onClick(View v) {
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
-                GuideDataModel guideDataModel = addedGuides.get(position).getGuideDataModel();
+                GuideDataModel guideDataModel = addedGuides.get(position);
                 Fragment fragment = new GuideDetailFragment(guideDataModel, mainActivity);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment);
                 fragmentTransaction.addToBackStack(null);
