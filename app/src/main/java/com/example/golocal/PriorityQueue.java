@@ -1,8 +1,9 @@
 package com.example.golocal;
 
-import android.util.Log;
+import com.example.golocal.models.GuideDataModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PriorityQueue {
     private ArrayList<PriorityQueueNode> maxHeap = new ArrayList<>();
@@ -12,7 +13,6 @@ public class PriorityQueue {
         int insertedNodeIndex = maxHeap.size() - 1;
         int insertedNodePriority = node.getPriority();
         while (insertedNodeIndex != 0 && insertedNodePriority > getParent(insertedNodeIndex).getPriority()) {
-            Log.e(String.valueOf(insertedNodePriority), String.valueOf(getParent(insertedNodeIndex).getPriority()));
             int parentIndex = getParentIndex(insertedNodeIndex);
             swap(getParentIndex(insertedNodeIndex), insertedNodeIndex);
             insertedNodeIndex = parentIndex;
@@ -87,7 +87,7 @@ public class PriorityQueue {
     }
 
     private PriorityQueueNode getParent(int nodeIndex) {
-        if (nodeIndex != 0) {
+        if (nodeIndex > 0) {
             return maxHeap.get((nodeIndex-1)/2);
         }
         return null;
@@ -98,25 +98,27 @@ public class PriorityQueue {
     }
 
     private PriorityQueueNode getLeftChild(int nodeIndex) {
-        if (2*nodeIndex + 1 < maxHeap.size()) {
-            return maxHeap.get((2*nodeIndex)+1);
+        int leftChildIndex = 2 * nodeIndex + 1;
+        if (leftChildIndex < maxHeap.size()) {
+            return maxHeap.get(leftChildIndex);
         }
         return null;
     }
 
     private PriorityQueueNode getRightChild(int nodeIndex) {
-        if (2*nodeIndex + 2 < maxHeap.size()) {
-            return maxHeap.get((2*nodeIndex)+2);
+        int rightChildIndex = 2 * nodeIndex + 2;
+        if (rightChildIndex < maxHeap.size()) {
+            return maxHeap.get(rightChildIndex);
         }
         return null;
     }
 
     private int getLeftChildIndex(int nodeIndex) {
-        return (2*nodeIndex)+1;
+        return (2 * nodeIndex) + 1;
     }
 
     private int getRightChildIndex(int nodeIndex) {
-        return (2*nodeIndex)+2;
+        return (2 * nodeIndex) + 2;
     }
 
     public String toString() {
@@ -136,12 +138,28 @@ public class PriorityQueue {
         maxHeap.clear();
     }
 
-    public ArrayList<PriorityQueueNode> getNodesInOrder() {
-        ArrayList<PriorityQueueNode> guides = new ArrayList<>();
+    public ArrayList<GuideDataModel> getAllGuidesInOrder() {
+        ArrayList<GuideDataModel> guides = new ArrayList<>();
+        ArrayList<PriorityQueueNode> nodes = new ArrayList<>();
         while (maxHeap.size() > 0) {
             PriorityQueueNode nextNode = remove();
-            guides.add(nextNode);
+            guides.add(nextNode.getGuideDataModel());
+            nodes.add(nextNode);
         }
+        insertAllNodes(nodes);
         return guides;
+    }
+
+    public void insertAllGuides(List<GuideDataModel> guidesList) {
+        for (GuideDataModel guide: guidesList) {
+            PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
+            insert(currentGuide);
+        }
+    }
+
+    private void insertAllNodes(List<PriorityQueueNode> nodesList) {
+        for (PriorityQueueNode node: nodesList) {
+            insert(node);
+        }
     }
 }
