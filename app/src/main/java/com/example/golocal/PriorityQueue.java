@@ -12,7 +12,6 @@ public class PriorityQueue {
         int insertedNodeIndex = maxHeap.size() - 1;
         int insertedNodePriority = node.getPriority();
         while (insertedNodeIndex != 0 && insertedNodePriority > getParent(insertedNodeIndex).getPriority()) {
-            Log.e(String.valueOf(insertedNodePriority), String.valueOf(getParent(insertedNodeIndex).getPriority()));
             int parentIndex = getParentIndex(insertedNodeIndex);
             swap(getParentIndex(insertedNodeIndex), insertedNodeIndex);
             insertedNodeIndex = parentIndex;
