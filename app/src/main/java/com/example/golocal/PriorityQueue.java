@@ -87,7 +87,7 @@ public class PriorityQueue {
     }
 
     private PriorityQueueNode getParent(int nodeIndex) {
-        if (nodeIndex != 0) {
+        if (nodeIndex > 0) {
             return maxHeap.get((nodeIndex-1)/2);
         }
         return null;
