@@ -112,7 +112,7 @@ public class PriorityQueue {
     }
 
     private int getLeftChildIndex(int nodeIndex) {
-        return (2*nodeIndex)+1;
+        return (2 * nodeIndex) + 1;
     }
 
     private int getRightChildIndex(int nodeIndex) {
