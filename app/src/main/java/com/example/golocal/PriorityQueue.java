@@ -98,25 +98,27 @@ public class PriorityQueue {
     }
 
     private PriorityQueueNode getLeftChild(int nodeIndex) {
-        if (2*nodeIndex + 1 < maxHeap.size()) {
-            return maxHeap.get((2*nodeIndex)+1);
+        int leftChildIndex = 2 * nodeIndex + 1;
+        if (leftChildIndex < maxHeap.size()) {
+            return maxHeap.get(leftChildIndex);
         }
         return null;
     }
 
     private PriorityQueueNode getRightChild(int nodeIndex) {
-        if (2*nodeIndex + 2 < maxHeap.size()) {
-            return maxHeap.get((2*nodeIndex)+2);
+        int rightChildIndex = 2 * nodeIndex + 2;
+        if (rightChildIndex < maxHeap.size()) {
+            return maxHeap.get(rightChildIndex);
         }
         return null;
     }
 
     private int getLeftChildIndex(int nodeIndex) {
-        return (2*nodeIndex)+1;
+        return (2 * nodeIndex) + 1;
     }
 
     private int getRightChildIndex(int nodeIndex) {
-        return (2*nodeIndex)+2;
+        return (2 * nodeIndex) + 2;
     }
 
     public String toString() {
