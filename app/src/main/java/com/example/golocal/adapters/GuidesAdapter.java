@@ -3,6 +3,7 @@ package com.example.golocal.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.transition.Scene;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
