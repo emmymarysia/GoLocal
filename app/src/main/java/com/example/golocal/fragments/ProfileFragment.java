@@ -2,6 +2,8 @@ package com.example.golocal.fragments;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,6 +56,7 @@ public class ProfileFragment extends Fragment {
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 42;
     private static final int PICK_PHOTO_CODE = 1046;
     private final String photoFileName = "photo.jpg";
+    private int shortAnimationDuration;
 
     private final String KEY_BIO = "bio";
     private static final String KEY_IMAGE = "profileImage";
@@ -126,6 +129,8 @@ public class ProfileFragment extends Fragment {
         ibAddFriend = view.findViewById(R.id.ibAddFriend);
         ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
 
+        shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
         List<ParseUser> friends = ParseUser.getCurrentUser().getList(KEY_FRIENDS);
         if (friends != null) {
             for (int i = 0; i < friends.size(); i++) {
@@ -179,15 +184,12 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
         btEditBio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvBio.setVisibility(View.GONE);
-                etBio.setVisibility(View.VISIBLE);
+                crossfade(tvBio, etBio);
                 etBio.setText(tvBio.getText().toString());
-                btEditBio.setVisibility(View.GONE);
-                btFinishEditBio.setVisibility(View.VISIBLE);
+                crossfade(btEditBio, btFinishEditBio);
                 btFinishEditBio.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -201,14 +203,32 @@ public class ProfileFragment extends Fragment {
                             }
                         });
                         tvBio.setText(user.getString(KEY_BIO));
-                        tvBio.setVisibility(View.VISIBLE);
-                        etBio.setVisibility(View.GONE);
-                        btEditBio.setVisibility(View.VISIBLE);
-                        btFinishEditBio.setVisibility(View.GONE);
+                        crossfade(etBio, tvBio);
+                        crossfade(btFinishEditBio, btEditBio);
                     }
                 });
             }
         });
+    }
+
+    private void crossfade(View startingView, View endingView) {
+        endingView.setAlpha(0f);
+        endingView.setVisibility(View.VISIBLE);
+
+        endingView.animate()
+                .alpha(1f)
+                .setDuration(shortAnimationDuration)
+                .setListener(null);
+
+        startingView.animate()
+                .alpha(0f)
+                .setDuration(shortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        startingView.setVisibility(View.GONE);
+                    }
+                });
     }
 
     private void setAddFriendListener() {
