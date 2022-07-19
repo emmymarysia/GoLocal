@@ -13,30 +13,15 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.golocal.PriorityQueue;
-import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.fragments.GuidesFragment;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.fragments.ProfileFragment;
 import com.example.golocal.R;
-import com.example.golocal.models.BusinessDataModel;
-import com.example.golocal.models.GuideDataModel;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.parse.ParseUser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
