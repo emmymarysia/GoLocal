@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -45,6 +46,11 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
     private ImageView ivBusinessImage;
     private int screenWidth;
     private Context context;
+    private Function<String, Void> postExecuteMethod;
+
+    public PlacesAsyncCall(Function<String, Void> postExecuteMethod) {
+        this.postExecuteMethod = postExecuteMethod;
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -78,28 +84,7 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String results) {
-        try {
-            if (requestType.equals(FROM_MAP_FRAGMENT)) {
-                postExecuteFromMapFragment(results);
-            } else if (requestType.equals(FROM_DETAIL_FRAGMENT)) {
-                setFields(results);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void postExecuteFromMapFragment(String results) throws JSONException {
-        JSONObject jsonResults = new JSONObject(results);
-        String name = jsonResults.getString("name");
-        String address = jsonResults.getJSONObject("location").getString("address");
-        Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
-        Double longitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude"));
-        LatLng businessLocation = new LatLng(latitude, longitude);
-        BusinessDataModel businessDataModel = new BusinessDataModel();
-        businessDataModel.setName(name);
-        businessDataModel.setAddress(address);
-        mapFragment.addMarker(businessLocation, businessDataModel);
+        postExecuteMethod.apply(results);
     }
 
     public void setMapFragment(MapFragment mapFragment) {
@@ -107,30 +92,5 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
     }
 
     public void setViewFields(TextView tvBusinessDescription, ImageView ivBusinessImage, int screenWidth, Context context) {
-        this.tvBusinessDescription = tvBusinessDescription;
-        this.ivBusinessImage = ivBusinessImage;
-        this.screenWidth = screenWidth;
-        this.context = context;
-    }
-
-    private void setFields(String data) throws JSONException {
-        JSONObject queryResponse = new JSONObject(data);
-        String businessDescription = queryResponse.optString("description");
-        if (businessDescription != null) {
-            tvBusinessDescription.setText(businessDescription);
-        } else {
-            tvBusinessDescription.setVisibility(View.GONE);
-        }
-        JSONArray photos = queryResponse.getJSONArray("photos");
-        if (photos.getJSONObject(0) != null) {
-            JSONObject businessPhoto = photos.getJSONObject(0);
-            String prefix = businessPhoto.getString("prefix");
-            String suffix = businessPhoto.getString("suffix");
-            String dimensions = Integer.valueOf(screenWidth) + "x" + Integer.valueOf(screenWidth);
-            String imageUrl = prefix + dimensions + suffix;
-            Glide.with(context).load(imageUrl).override(screenWidth, screenWidth).into(ivBusinessImage);
-        } else {
-            ivBusinessImage.setVisibility(View.GONE);
-        }
     }
 }

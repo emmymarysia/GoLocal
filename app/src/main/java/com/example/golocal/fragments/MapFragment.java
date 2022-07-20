@@ -37,8 +37,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.function.Function;
 
 public class MapFragment extends Fragment {
 
@@ -51,11 +55,31 @@ public class MapFragment extends Fragment {
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
-    private PlacesAsyncCall call = new PlacesAsyncCall();
+    private Function<String, Void> postExecuteMethod = this::postExecuteFromMapFragment;
+    private PlacesAsyncCall call = new PlacesAsyncCall(postExecuteMethod);
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
         mCurrentLocation = currentLocation;
+    }
+
+    public Void postExecuteFromMapFragment(String results) {
+        JSONObject jsonResults = null;
+        try {
+            jsonResults = new JSONObject(results);
+            String name = jsonResults.getString("name");
+            String address = jsonResults.getJSONObject("location").getString("address");
+            Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
+            Double longitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude"));
+            LatLng businessLocation = new LatLng(latitude, longitude);
+            BusinessDataModel businessDataModel = new BusinessDataModel();
+            businessDataModel.setName(name);
+            businessDataModel.setAddress(address);
+            addMarker(businessLocation, businessDataModel);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
