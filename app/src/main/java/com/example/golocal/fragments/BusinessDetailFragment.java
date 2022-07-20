@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -65,12 +66,44 @@ public class BusinessDetailFragment extends Fragment {
         tvBusinessAddress = view.findViewById(R.id.tvBusinessAddress);
         tvBusinessDescription = view.findViewById(R.id.tvBusinessDescription);
         ivBusinessImage = view.findViewById(R.id.ivBusinessImage);
-        PlacesAPICall call = new PlacesAPICall();
+        Function<String, Void> postExecuteMethod = this::setFields;
+        PlacesAPICall call = new PlacesAPICall(postExecuteMethod);
         call.setViewFields(tvBusinessDescription, ivBusinessImage, screenWidth, getContext());
         call.execute(foursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_DETAIL_FRAGMENT);
 
         tvBusinessTitle.setText(businessDataModel.getName());
         tvBusinessAddress.setText(businessDataModel.getAddress());
 
+    }
+
+    private Void setFields(String data) {
+        Log.e("hello", "entered here");
+        this.tvBusinessDescription = tvBusinessDescription;
+        this.ivBusinessImage = ivBusinessImage;
+        this.screenWidth = screenWidth;
+        JSONObject queryResponse = null;
+        try {
+            queryResponse = new JSONObject(data);
+            String businessDescription = queryResponse.optString("description");
+            if (businessDescription != null) {
+                tvBusinessDescription.setText(businessDescription);
+            } else {
+                tvBusinessDescription.setVisibility(View.GONE);
+            }
+            JSONArray photos = queryResponse.getJSONArray("photos");
+            if (photos.getJSONObject(0) != null) {
+                JSONObject businessPhoto = photos.getJSONObject(0);
+                String prefix = businessPhoto.getString("prefix");
+                String suffix = businessPhoto.getString("suffix");
+                String dimensions = Integer.valueOf(screenWidth) + "x" + Integer.valueOf(screenWidth);
+                String imageUrl = prefix + dimensions + suffix;
+                Glide.with(getContext()).load(imageUrl).override(screenWidth, screenWidth).into(ivBusinessImage);
+            } else {
+                ivBusinessImage.setVisibility(View.GONE);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
