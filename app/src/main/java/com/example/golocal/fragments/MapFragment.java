@@ -47,6 +47,7 @@ import java.util.function.Function;
 public class MapFragment extends Fragment {
 
     public static final int CAMERA_ZOOM = 17;
+    private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     private SupportMapFragment mapFragment;
@@ -89,8 +90,8 @@ public class MapFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
-            call.setMapFragment(this);
-            call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAsyncCall.FROM_MAP_FRAGMENT);
+            String requestUrl = PLACES_URL + businessFoursquareId + "?fields=description,photos";
+            call.execute(requestUrl, getString(R.string.foursquare_api_key));
         }
     }
 

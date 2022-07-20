@@ -41,12 +41,8 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
     private String foursquareId;
     private String apiKey;
     private String requestType;
-    private MapFragment mapFragment;
-    private TextView tvBusinessDescription;
-    private ImageView ivBusinessImage;
-    private int screenWidth;
-    private Context context;
     private Function<String, Void> postExecuteMethod;
+    private String requestUrl;
 
     public PlacesAsyncCall(Function<String, Void> postExecuteMethod) {
         this.postExecuteMethod = postExecuteMethod;
@@ -54,17 +50,9 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... params) {
-
-        foursquareId = params[0];
+        requestUrl = params[0];
         apiKey = params[1];
-        requestType = params[2];
 
-        String requestUrl;
-        if (requestType.equals(FROM_DETAIL_FRAGMENT)) {
-            requestUrl = PLACES_URL + foursquareId + "?fields=description,photos";
-        } else {
-            requestUrl = PLACES_URL + foursquareId;
-        }
         Request request = new Request.Builder()
                 .url(requestUrl)
                 .get()
@@ -85,12 +73,5 @@ public class PlacesAsyncCall extends AsyncTask<String, Void, String> {
 
     protected void onPostExecute(String results) {
         postExecuteMethod.apply(results);
-    }
-
-    public void setMapFragment(MapFragment mapFragment) {
-        this.mapFragment = mapFragment;
-    }
-
-    public void setViewFields(TextView tvBusinessDescription, ImageView ivBusinessImage, int screenWidth, Context context) {
     }
 }

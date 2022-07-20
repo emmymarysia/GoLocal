@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.golocal.AsyncTasks.PlacesAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.BusinessAdapter;
@@ -25,10 +26,12 @@ import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class CreateGuideFragment extends Fragment {
 
     private final String TAG = "CreateGuideFragment";
+    private final String PLACES_SEARCH_URL = "https://api.foursquare.com/v3/places/search";
 
     private EditText etTitle;
     private EditText etDescription;
@@ -42,6 +45,7 @@ public class CreateGuideFragment extends Fragment {
     private List<BusinessDataModel> businessDataModelList;
     private MainActivity mainActivity;
     private BusinessAdapter adapter;
+    private PlacesAsyncCall call;
 
     public CreateGuideFragment(MainActivity main) {
         mainActivity = main;
@@ -57,6 +61,8 @@ public class CreateGuideFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Function<String, Void> postExecuteMethod = this::parseBusinessFromJson;
+        call = new PlacesAsyncCall(postExecuteMethod);
         guideDataModel = new GuideDataModel();
         businessDataModelList = new ArrayList<>();
         etTitle = view.findViewById(R.id.etTitle);
@@ -86,6 +92,8 @@ public class CreateGuideFragment extends Fragment {
                         BusinessDataModel businessDataModel = new BusinessDataModel();
                         businessDataModel.setName(name);
                         businessDataModel.setDescription(description);
+                        String requestUrl = PLACES_SEARCH_URL + "?query=" + name;
+                        call.execute(requestUrl, getString(R.string.foursquare_api_key));
                         businessDataModelList.add(businessDataModel);
                         businessDataModel.saveInBackground(new SaveCallback() {
                             @Override
@@ -130,5 +138,10 @@ public class CreateGuideFragment extends Fragment {
 
             }
         });
+    }
+
+    public Void parseBusinessFromJson(String results) {
+
+        return null;
     }
 }

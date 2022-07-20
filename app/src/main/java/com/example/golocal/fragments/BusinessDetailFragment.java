@@ -61,8 +61,8 @@ public class BusinessDetailFragment extends Fragment {
         ivBusinessImage = view.findViewById(R.id.ivBusinessImage);
         Function<String, Void> postExecuteMethod = this::setFields;
         PlacesAsyncCall call = new PlacesAsyncCall(postExecuteMethod);
-        call.setViewFields(tvBusinessDescription, ivBusinessImage, screenWidth, getContext());
-        call.execute(foursquareId, getString(R.string.foursquare_api_key), PlacesAsyncCall.FROM_DETAIL_FRAGMENT);
+        String requestUrl =  PLACES_URL + foursquareId + "?fields=description,photos";
+        call.execute(requestUrl, getString(R.string.foursquare_api_key));
 
         tvBusinessTitle.setText(businessDataModel.getName());
         tvBusinessAddress.setText(businessDataModel.getAddress());
@@ -70,9 +70,6 @@ public class BusinessDetailFragment extends Fragment {
     }
 
     private Void setFields(String data) {
-        this.tvBusinessDescription = tvBusinessDescription;
-        this.ivBusinessImage = ivBusinessImage;
-        this.screenWidth = screenWidth;
         JSONObject queryResponse = null;
         try {
             queryResponse = new JSONObject(data);
