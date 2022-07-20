@@ -4,12 +4,13 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,7 +22,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.golocal.AsyncTasks.AutocompleteAsyncCall;
+import com.example.golocal.AsyncTasks.PlacesAPICall;
 import com.example.golocal.AsyncTasks.SearchAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
@@ -31,42 +32,85 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.function.Function;
 
 public class MapFragment extends Fragment {
 
-    private static final int CAMERA_ZOOM = 17;
+    public static final int CAMERA_ZOOM = 17;
     private static final DecimalFormat df = new DecimalFormat("0.00");
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private Location mCurrentLocation;
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
-    public ArrayList<BusinessDataModel> autocompleteResults = new ArrayList<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
+    private Function<String, Void> postExecuteMethod = this::postExecuteFromMapFragment;
+    private PlacesAPICall call = new PlacesAPICall(postExecuteMethod);
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
         mCurrentLocation = currentLocation;
     }
 
+    public Void postExecuteFromMapFragment(String results) {
+        JSONObject jsonResults = null;
+        try {
+            jsonResults = new JSONObject(results);
+            String name = jsonResults.getString("name");
+            String address = jsonResults.getJSONObject("location").getString("address");
+            Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
+            Double longitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("longitude"));
+            LatLng businessLocation = new LatLng(latitude, longitude);
+            BusinessDataModel businessDataModel = new BusinessDataModel();
+            businessDataModel.setName(name);
+            businessDataModel.setAddress(address);
+            addMarker(businessLocation, businessDataModel);
+            Log.e("hello", "entered here");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Intent intent = getActivity().getIntent();
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String businessFoursquareId = intent.getData().getLastPathSegment();
+            call.setMapFragment(this);
+            call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_MAP_FRAGMENT);
+        }
+    }
+
+    public void addMarker(LatLng markerPosition, BusinessDataModel businessDataModel) {
+        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+        Marker mapMarker = map.addMarker(new MarkerOptions()
+                .position(markerPosition)
+                .title(businessDataModel.getName())
+                .snippet(businessDataModel.getAddress())
+                .icon(defaultMarker));
+        queryResultBusinesses.put(mapMarker, businessDataModel);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(markerPosition, CAMERA_ZOOM);
+        map.animateCamera(cameraUpdate);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_map, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) mainActivity.getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(mainActivity.getComponentName()));
@@ -87,7 +131,6 @@ public class MapFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // TODO: implement checking for intent and action if a suggestion is clicked
                 return false;
             }
         });
@@ -108,7 +151,7 @@ public class MapFragment extends Fragment {
         btFilterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: implement going to filter fragment
+                // TODO: implement listener for filter button
             }
         });
     }
@@ -144,8 +187,6 @@ public class MapFragment extends Fragment {
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                String title = marker.getTitle();
-                String address = marker.getSnippet();
                 BusinessDataModel clickedBusiness = queryResultBusinesses.get(marker);
                 BusinessDetailFragment businessDetailFragment = new BusinessDetailFragment(clickedBusiness);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction();
@@ -165,5 +206,4 @@ public class MapFragment extends Fragment {
             map.animateCamera(cameraUpdate);
         }
     }
-
 }

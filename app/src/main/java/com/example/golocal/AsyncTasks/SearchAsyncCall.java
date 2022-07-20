@@ -37,7 +37,6 @@ public class SearchAsyncCall extends AsyncTask<String, Void, String> {
     private GoogleMap map;
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
-    private MapAutocompleteProvider provider = new MapAutocompleteProvider();
     public AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
 
     @Override
@@ -47,7 +46,6 @@ public class SearchAsyncCall extends AsyncTask<String, Void, String> {
         apiKey = params[2];
 
         String results = makeApiRequest(SEARCH_URL + params[0] + "&ll=" + userLocation + "&exclude_all_chains=true");
-
         return results;
     }
 

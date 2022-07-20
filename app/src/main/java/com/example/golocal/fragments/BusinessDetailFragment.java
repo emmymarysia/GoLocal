@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.example.golocal.AsyncTasks.PlacesAPICall;
 import com.example.golocal.R;
 import com.example.golocal.models.BusinessDataModel;
 
@@ -24,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -60,67 +62,48 @@ public class BusinessDetailFragment extends Fragment {
         screenWidth = displayMetrics.widthPixels;
 
         String foursquareId = businessDataModel.getFoursquareId();
-        PlaceQueryCall call = new PlaceQueryCall();
-        call.execute(foursquareId);
-
         tvBusinessTitle = view.findViewById(R.id.tvBusinessTitle);
         tvBusinessAddress = view.findViewById(R.id.tvBusinessAddress);
         tvBusinessDescription = view.findViewById(R.id.tvBusinessDescription);
         ivBusinessImage = view.findViewById(R.id.ivBusinessImage);
+        Function<String, Void> postExecuteMethod = this::setFields;
+        PlacesAPICall call = new PlacesAPICall(postExecuteMethod);
+        call.setViewFields(tvBusinessDescription, ivBusinessImage, screenWidth, getContext());
+        call.execute(foursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_DETAIL_FRAGMENT);
+
         tvBusinessTitle.setText(businessDataModel.getName());
         tvBusinessAddress.setText(businessDataModel.getAddress());
 
     }
 
-    private class PlaceQueryCall extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            Request request = new Request.Builder()
-                    .url(PLACES_URL + params[0] + "?fields=description,photos")
-                    .get()
-                    .addHeader("Accept", "application/json")
-                    .addHeader("Authorization", getResources().getString(R.string.foursquare_api_key))
-                    .build();
-
-            String results;
-            try {
-                Response response = client.newCall(request).execute();
-                results = response.body().string();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+    private Void setFields(String data) {
+        Log.e("hello", "entered here");
+        this.tvBusinessDescription = tvBusinessDescription;
+        this.ivBusinessImage = ivBusinessImage;
+        this.screenWidth = screenWidth;
+        JSONObject queryResponse = null;
+        try {
+            queryResponse = new JSONObject(data);
+            String businessDescription = queryResponse.optString("description");
+            if (businessDescription != null) {
+                tvBusinessDescription.setText(businessDescription);
+            } else {
+                tvBusinessDescription.setVisibility(View.GONE);
             }
-            return results;
-        }
-
-        protected void onPostExecute(String results) {
-            try {
-                setFields(results);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            JSONArray photos = queryResponse.getJSONArray("photos");
+            if (photos.getJSONObject(0) != null) {
+                JSONObject businessPhoto = photos.getJSONObject(0);
+                String prefix = businessPhoto.getString("prefix");
+                String suffix = businessPhoto.getString("suffix");
+                String dimensions = Integer.valueOf(screenWidth) + "x" + Integer.valueOf(screenWidth);
+                String imageUrl = prefix + dimensions + suffix;
+                Glide.with(getContext()).load(imageUrl).override(screenWidth, screenWidth).into(ivBusinessImage);
+            } else {
+                ivBusinessImage.setVisibility(View.GONE);
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-    }
-
-    private void setFields(String data) throws JSONException {
-        JSONObject queryResponse = new JSONObject(data);
-        String businessDescription = queryResponse.optString("description");
-        if (businessDescription != null) {
-            tvBusinessDescription.setText(businessDescription);
-        } else {
-            tvBusinessDescription.setVisibility(View.GONE);
-        }
-        JSONArray photos = queryResponse.getJSONArray("photos");
-        if (photos.getJSONObject(0) != null) {
-            JSONObject businessPhoto = photos.getJSONObject(0);
-            String prefix = businessPhoto.getString("prefix");
-            String suffix = businessPhoto.getString("suffix");
-            String dimensions = Integer.valueOf(screenWidth) + "x" + Integer.valueOf(screenWidth);
-            String imageUrl = prefix + dimensions + suffix;
-            Glide.with(this).load(imageUrl).override(screenWidth, screenWidth).into(ivBusinessImage);
-        } else {
-            ivBusinessImage.setVisibility(View.GONE);
-        }
+        return null;
     }
 }

@@ -19,20 +19,9 @@ import com.example.golocal.fragments.GuidesFragment;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.fragments.ProfileFragment;
 import com.example.golocal.R;
-import com.example.golocal.models.BusinessDataModel;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.parse.ParseUser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,13 +53,15 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_INTERVAL, MIN_DISTANCE, new LocationListener() {
+        locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, MIN_TIME_INTERVAL, MIN_DISTANCE, new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
                 currentLocation = location;
                 mapFragment.updateLocation(location);
             }
         });
+
+
 
         currentUser = ParseUser.getCurrentUser();
 
