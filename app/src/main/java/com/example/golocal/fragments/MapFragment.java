@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,6 +50,7 @@ public class MapFragment extends Fragment {
     public static final int CAMERA_ZOOM = 17;
     private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
     private static final DecimalFormat df = new DecimalFormat("0.00");
+    private BitmapDescriptor defaultMarker;
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -119,7 +121,8 @@ public class MapFragment extends Fragment {
                 Double latitude = mCurrentLocation.getLatitude();
                 Double longitude = mCurrentLocation.getLongitude();
                 String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
-                SearchAsyncCall call = new SearchAsyncCall();
+                Function<String, Void> postExecuteMethod = MapFragment.this::queryResultsFromJson;
+                SearchAsyncCall call = new SearchAsyncCall(postExecuteMethod);
                 call.setGoogleMap(map);
                 call.setMapFragment(MapFragment.this);
                 call.execute(query, userLocation, getResources().getString(R.string.foursquare_api_key));
@@ -169,6 +172,7 @@ public class MapFragment extends Fragment {
                 @Override
                 public void onMapReady(GoogleMap map) {
                     loadMap(map);
+                    defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
                 }
             });
         } else {
@@ -204,5 +208,54 @@ public class MapFragment extends Fragment {
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, CAMERA_ZOOM);
             map.animateCamera(cameraUpdate);
         }
+    }
+
+    public Void queryResultsFromJson(String data) {
+        JSONObject queryResponse = null;
+        try {
+            queryResponse = new JSONObject(data);LatLng mapCenter = null;
+            JSONArray results = queryResponse.getJSONArray("results");
+            queryResultBusinesses.clear();
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject business = results.getJSONObject(i);
+                LatLng markerPosition = createBusinessModelFromJson(business);
+                if (i == 0) {
+                    mapCenter = markerPosition;
+                }
+            }
+            if (mapCenter != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(mapCenter, CAMERA_ZOOM));
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // set the results hashmap back in the mapFragment
+        // queryResultBusinesses.clear();
+        // queryResultBusinesses.putAll(this.queryResultBusinesses);
+        return null;
+    }
+
+    public LatLng createBusinessModelFromJson(JSONObject business) throws JSONException {
+        String address = business.getJSONObject("location").getString("address");
+        String foursquareId = business.getString("fsq_id");
+        String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
+        String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
+        LatLng markerPosition = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
+        String businessName = business.getString("name");
+        BusinessDataModel currentBusiness = new BusinessDataModel();
+        currentBusiness.setName(businessName);
+        currentBusiness.setAddress(address);
+        currentBusiness.setFoursquareId(foursquareId);
+        addMapMarker(markerPosition, businessName, address, currentBusiness);
+        return markerPosition;
+    }
+
+    public void addMapMarker(LatLng markerPosition, String businessName, String address, BusinessDataModel currentBusiness) {
+        Marker mapMarker = map.addMarker(new MarkerOptions()
+                .position(markerPosition)
+                .title(businessName)
+                .snippet(address)
+                .icon(defaultMarker));
+        queryResultBusinesses.put(mapMarker, currentBusiness);
     }
 }
