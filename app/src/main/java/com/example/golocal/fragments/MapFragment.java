@@ -78,7 +78,7 @@ public class MapFragment extends Fragment {
                 .snippet(businessDataModel.getAddress())
                 .icon(defaultMarker));
         queryResultBusinesses.put(mapMarker, businessDataModel);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(markerPosition, 17);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(markerPosition, CAMERA_ZOOM);
         map.moveCamera(cameraUpdate);
     }
 
