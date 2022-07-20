@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +21,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.golocal.AsyncTasks.PlacesAPICall;
+import com.example.golocal.AsyncTasks.PlacesAsyncCall;
 import com.example.golocal.AsyncTasks.SearchAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
@@ -52,7 +51,7 @@ public class MapFragment extends Fragment {
     public HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MainActivity mainActivity;
     private Button btFilterMap;
-    private PlacesAPICall call = new PlacesAPICall();
+    private PlacesAsyncCall call = new PlacesAsyncCall();
 
     public MapFragment(MainActivity main, Location currentLocation) {
         mainActivity = main;
@@ -67,7 +66,7 @@ public class MapFragment extends Fragment {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
             call.setMapFragment(this);
-            call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAPICall.FROM_MAP_FRAGMENT);
+            call.execute(businessFoursquareId, getString(R.string.foursquare_api_key), PlacesAsyncCall.FROM_MAP_FRAGMENT);
         }
     }
 
@@ -80,7 +79,7 @@ public class MapFragment extends Fragment {
                 .icon(defaultMarker));
         queryResultBusinesses.put(mapMarker, businessDataModel);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(markerPosition, CAMERA_ZOOM);
-        map.animateCamera(cameraUpdate);
+        map.moveCamera(cameraUpdate);
     }
 
     @Override

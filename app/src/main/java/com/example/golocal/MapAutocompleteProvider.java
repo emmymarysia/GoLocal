@@ -59,6 +59,7 @@ public class MapAutocompleteProvider extends ContentProvider {
         }
         List<String> providers = locationManager.getProviders(true);
         String userLocation = "";
+        // loop through all location providers to see if any can provide the user's current location
         for (int i = providers.size()-1; i >= 0; i--) {
             Location currentLocation = locationManager.getLastKnownLocation(providers.get(i));
             if (currentLocation != null) {

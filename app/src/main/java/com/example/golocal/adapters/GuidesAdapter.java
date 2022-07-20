@@ -1,8 +1,10 @@
 package com.example.golocal.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -88,7 +90,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 GuideDataModel guideDataModel = addedGuides.get(position);
-                Fragment fragment = new GuideDetailFragment(guideDataModel, mainActivity);
+                Fragment fragment = new GuideDetailFragment(guideDataModel, mainActivity.fragmentManager);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

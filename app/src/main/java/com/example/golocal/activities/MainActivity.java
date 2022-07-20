@@ -53,12 +53,14 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_INTERVAL, MIN_DISTANCE, new LocationListener() {
+        locationManager.requestLocationUpdates(LocationManager.FUSED_PROVIDER, MIN_TIME_INTERVAL, MIN_DISTANCE, new LocationListener() {
             @Override
             public void onLocationChanged(@NonNull Location location) {
                 currentLocation = location;
                 mapFragment.updateLocation(location);
             }
+
+
         });
 
         currentUser = ParseUser.getCurrentUser();
