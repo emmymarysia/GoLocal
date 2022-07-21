@@ -86,11 +86,11 @@ This app aims to connect people with local businesses and experiences. With the 
   - *Post photos when you visit*
   - *Filter search*
 - **Guides list**
-  - Create a guideDataModel
-  - Complete view of a specific guideDataModel when clicked
+  - Create a guide
+  - Complete view of a specific guide when clicked
 - **User profile**
-  - Create a guideDataModel
-  - Search for/add friends
+  - Create a guide
+  - *Search for/add friends*
   - *Create plans for a trip with friends*
   - *Post photos of a business you visited*
 - ***Events Calendar***
