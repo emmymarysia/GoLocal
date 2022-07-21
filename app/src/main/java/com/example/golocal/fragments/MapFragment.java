@@ -49,7 +49,7 @@ public class MapFragment extends Fragment {
 
     public static final int CAMERA_ZOOM = 17;
     private final String PLACES_URL = "https://api.foursquare.com/v3/places/";
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+    private static final DecimalFormat df = new DecimalFormat("0.00000");
     private BitmapDescriptor defaultMarker;
 
     private SupportMapFragment mapFragment;

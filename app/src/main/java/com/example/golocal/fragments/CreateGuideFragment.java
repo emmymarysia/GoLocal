@@ -15,14 +15,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.golocal.AsyncTasks.PlacesAsyncCall;
+import com.example.golocal.AsyncTasks.SearchAsyncCall;
 import com.example.golocal.R;
 import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.BusinessAdapter;
 import com.example.golocal.models.BusinessDataModel;
 import com.example.golocal.models.GuideDataModel;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +52,7 @@ public class CreateGuideFragment extends Fragment {
     private List<BusinessDataModel> businessDataModelList;
     private MainActivity mainActivity;
     private BusinessAdapter adapter;
-    private PlacesAsyncCall call;
+    private SearchAsyncCall call;
 
     public CreateGuideFragment(MainActivity main) {
         mainActivity = main;
@@ -62,7 +69,7 @@ public class CreateGuideFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Function<String, Void> postExecuteMethod = this::parseBusinessFromJson;
-        call = new PlacesAsyncCall(postExecuteMethod);
+        call = new SearchAsyncCall(postExecuteMethod);
         guideDataModel = new GuideDataModel();
         businessDataModelList = new ArrayList<>();
         etTitle = view.findViewById(R.id.etTitle);
@@ -88,23 +95,8 @@ public class CreateGuideFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         String name = etName.getText().toString();
-                        String description = etBusinessDescription.getText().toString();
-                        BusinessDataModel businessDataModel = new BusinessDataModel();
-                        businessDataModel.setName(name);
-                        businessDataModel.setDescription(description);
-                        String requestUrl = PLACES_SEARCH_URL + "?query=" + name;
-                        call.execute(requestUrl, getString(R.string.foursquare_api_key));
-                        businessDataModelList.add(businessDataModel);
-                        businessDataModel.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                if (e != null) {
-                                    Log.e(TAG, "Error while saving", e);
-                                }
-                            }
-                        });
-                        etName.setText("");
-                        etBusinessDescription.setText("");
+                        String userLocation = mainActivity.getLocation();
+                        call.execute(name, userLocation, getString(R.string.foursquare_api_key));
                         etName.setVisibility(View.GONE);
                         etBusinessDescription.setVisibility(View.GONE);
                         btAdd.setVisibility(View.GONE);
@@ -140,8 +132,38 @@ public class CreateGuideFragment extends Fragment {
         });
     }
 
-    public Void parseBusinessFromJson(String results) {
-
+    public Void parseBusinessFromJson(String response) {
+        JSONObject queryResponse = null;
+        try {
+            String name = etName.getText().toString();
+            String description = etBusinessDescription.getText().toString();
+            etName.setText("");
+            etBusinessDescription.setText("");
+            BusinessDataModel businessDataModel = new BusinessDataModel();
+            businessDataModel.setName(name);
+            businessDataModel.setDescription(description);
+            queryResponse = new JSONObject(response);
+            JSONArray results = queryResponse.getJSONArray("results");
+            JSONObject business = results.getJSONObject(0);
+            String latitude = business.getJSONObject("geocodes").getJSONObject("main").getString("latitude");
+            Log.e("latitude", latitude);
+            String longitude = business.getJSONObject("geocodes").getJSONObject("main").getString("longitude");
+            String address = business.getJSONObject("location").getString("address");
+            businessDataModel.setLatitude(latitude);
+            businessDataModel.setLongitude(longitude);
+            businessDataModel.setAddress(address);
+            businessDataModelList.add(businessDataModel);
+            businessDataModel.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, "Error while saving", e);
+                    }
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
