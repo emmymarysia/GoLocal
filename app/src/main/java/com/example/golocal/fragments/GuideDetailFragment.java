@@ -96,14 +96,24 @@ public class GuideDetailFragment extends Fragment {
             businessListCopy.addAll(businessList);
             businessListCopy.remove(business);
             HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosest(distancesList, businessListCopy);
-            BusinessNode currentBusinessNode = new BusinessNode();
+            BusinessNode currentBusinessNode = graph.getNodes().get(business);
+            if (currentBusinessNode == null) {
+                currentBusinessNode = new BusinessNode(business);
+            }
             for (BusinessDataModel key : closestBusinesses.keySet()) {
                 Double distance = closestBusinesses.get(key);
                 currentBusinessNode.addAdjacentNode(key, distance);
+                BusinessNode neighborBusiness = graph.getNodes().get(key);
+                if (neighborBusiness == null) {
+                    neighborBusiness = new BusinessNode(key);
+                }
+                // this makes all the pointers "doubly linked" so that we guarantee every node is reachable
+                neighborBusiness.addAdjacentNode(business, distance);
+                graph.addNode(key, neighborBusiness);
             }
             graph.addNode(business, currentBusinessNode);
         }
-        graph.getBusinesses();
+        graph.dijkstra(graph.getNodes().get(businessList.get(0)));
     }
 
     private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
