@@ -15,6 +15,8 @@ public class BusinessDataModel extends ParseObject {
     public static final String KEY_ADDRESS = "address";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_FOURSQUAREID = "foursquareID";
+    public static final String KEY_LATITUDE = "latitude";
+    public static final String KEY_LONGITUDE = "longitude";
     private final String TAG = "BusinessDataModel";
 
     public String getName() {
@@ -60,5 +62,26 @@ public class BusinessDataModel extends ParseObject {
 
     public void setFoursquareId(String id) {
         put(KEY_FOURSQUAREID, id);
+    }
+
+    public void setLatitude(String latitude) {
+        put(KEY_LATITUDE, latitude);
+    }
+
+    public String getLatitude() {
+        try {
+            return fetchIfNeeded().getString(KEY_LATITUDE);
+        } catch (ParseException e) {
+            Log.e(TAG, "Couldn't get latitude", e);
+        }
+        return "";
+    }
+
+    public void setLongitude(String longitude) {
+        put(KEY_LONGITUDE, longitude);
+    }
+
+    public String getLongitude() {
+        return getString(KEY_LONGITUDE);
     }
 }

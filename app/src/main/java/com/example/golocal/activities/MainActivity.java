@@ -13,30 +13,18 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.golocal.PriorityQueue;
-import com.example.golocal.PriorityQueueNode;
 import com.example.golocal.fragments.GuidesFragment;
 import com.example.golocal.fragments.MapFragment;
 import com.example.golocal.fragments.ProfileFragment;
 import com.example.golocal.R;
-import com.example.golocal.models.BusinessDataModel;
-import com.example.golocal.models.GuideDataModel;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public GuidesFragment guidesFragment;
     public ProfileFragment profileFragment;
     public final FragmentManager fragmentManager = getSupportFragmentManager();
+    private static final DecimalFormat df = new DecimalFormat("0.00000");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
                 mapFragment.updateLocation(location);
             }
         });
-
-
 
         currentUser = ParseUser.getCurrentUser();
 
@@ -112,5 +99,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         bottomNavigationView.setSelectedItemId(R.id.action_map);
+    }
+
+    public String getLocation() {
+        Double latitude = this.currentLocation.getLatitude();
+        Double longitude = this.currentLocation.getLongitude();
+        String userLocation = df.format(latitude) + "%2C" + df.format(longitude);
+        return userLocation;
     }
 }

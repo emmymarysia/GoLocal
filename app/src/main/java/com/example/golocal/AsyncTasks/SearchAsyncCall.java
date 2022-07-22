@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.function.Function;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,7 +38,11 @@ public class SearchAsyncCall extends AsyncTask<String, Void, String> {
     private GoogleMap map;
     private HashMap<Marker, BusinessDataModel> queryResultBusinesses = new HashMap<>();
     private MapFragment mapFragment;
-    public AutocompleteResultDataModel autocompleteResults = new AutocompleteResultDataModel();
+    private Function<String, Void> postExecuteMethod;
+
+    public SearchAsyncCall(Function<String, Void> postExecuteMethod) {
+        this.postExecuteMethod = postExecuteMethod;
+    }
 
     @Override
     protected String doInBackground(String... params) {
@@ -50,11 +55,7 @@ public class SearchAsyncCall extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String results) {
-        try {
-            queryResultsFromJson(results);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        postExecuteMethod.apply(results);
     }
 
     private String makeApiRequest(String url) {
