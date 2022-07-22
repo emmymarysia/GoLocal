@@ -1,0 +1,169 @@
+package com.example.golocal.fragments;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import com.example.golocal.BusinessGraph;
+import com.example.golocal.BusinessNode;
+import com.example.golocal.R;
+import com.example.golocal.models.BusinessDataModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class RouteFragment extends DialogFragment {
+
+    private ArrayList<BusinessDataModel> businessList;
+    private Button btFindRoute;
+    private AutoCompleteTextView startingBusiness;
+    private AutoCompleteTextView endingBusiness;
+    private BusinessDataModel start;
+    private BusinessDataModel end;
+
+
+    public RouteFragment(ArrayList<BusinessDataModel> businessList) {
+        this.businessList = businessList;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        return super.onCreateDialog(savedInstanceState);
+    }
+
+    @Override
+    public void show(@NonNull FragmentManager manager, @Nullable String tag) {
+        super.show(manager, tag);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        this.btFindRoute = view.findViewById(R.id.btFindRoute);
+        this.startingBusiness = view.findViewById(R.id.tiStartingBusiness);
+        this.endingBusiness = view.findViewById(R.id.tiEndingBusiness);
+        ArrayList<String> businessNames = new ArrayList<>();
+        for (BusinessDataModel business : businessList) {
+            businessNames.add(business.getName());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, businessNames);
+        startingBusiness.setAdapter(adapter);
+        endingBusiness.setAdapter(adapter);
+        startingBusiness.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                start = businessList.get(position);
+            }
+        });
+
+        endingBusiness.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                end = businessList.get(position);
+            }
+        });
+
+        btFindRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onRouteButton(start, end);
+            }
+        });
+    }
+
+    private void onRouteButton(BusinessDataModel startingBusiness, BusinessDataModel endingBusiness) {
+        BusinessGraph graph = new BusinessGraph();
+        for (BusinessDataModel business : businessList) {
+            String latitude = business.getLatitude();
+            String longitude = business.getLongitude();
+            ArrayList<Double> distancesList = new ArrayList<>();
+            for (BusinessDataModel visitBusiness : businessList) {
+                if (visitBusiness.hasSameId(business)) {
+                    continue;
+                } else {
+                    String visitLatitude = visitBusiness.getLatitude();
+                    String visitLongitude = visitBusiness.getLongitude();
+                    double distance = distanceBetweenPoints(latitude, longitude, visitLatitude, visitLongitude);
+                    distancesList.add(distance);
+                }
+            }
+            ArrayList<BusinessDataModel> businessListCopy = new ArrayList<>();
+            businessListCopy.addAll(businessList);
+            businessListCopy.remove(business);
+            HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosest(distancesList, businessListCopy);
+            BusinessNode currentBusinessNode = graph.getNodes().get(business);
+            if (currentBusinessNode == null) {
+                currentBusinessNode = new BusinessNode(business);
+            }
+            for (BusinessDataModel key : closestBusinesses.keySet()) {
+                Double distance = closestBusinesses.get(key);
+                currentBusinessNode.addAdjacentNode(key, distance);
+                BusinessNode neighborBusiness = graph.getNodes().get(key);
+                if (neighborBusiness == null) {
+                    neighborBusiness = new BusinessNode(key);
+                }
+                // this makes all the pointers "doubly linked" so that we guarantee every node is reachable
+                neighborBusiness.addAdjacentNode(business, distance);
+                graph.addNode(key, neighborBusiness);
+            }
+            graph.addNode(business, currentBusinessNode);
+        }
+        BusinessNode startingBusinessNode = graph.getNodes().get(startingBusiness);
+        graph.dijkstra(startingBusinessNode);
+    }
+
+    private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
+        double lat1 = Math.toRadians(Double.parseDouble(latitude1));
+        double long1 = Math.toRadians(Double.parseDouble(longitude1));
+        double lat2 = Math.toRadians(Double.parseDouble(latitude2));
+        double long2 = Math.toRadians(Double.parseDouble(longitude2));
+
+        double longitudeDistance = long2 - long1;
+        double latitudeDistance = lat2 - lat1;
+        double step1 = Math.pow(Math.sin(latitudeDistance / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(longitudeDistance / 2),2);
+        double computation = 2 * Math.asin(Math.sqrt(step1));
+
+        double earthRadius = 3956;
+        return computation * earthRadius;
+    }
+
+    private HashMap<BusinessDataModel, Double> getThreeClosest(ArrayList<Double> distancesList, ArrayList<BusinessDataModel> businessList) {
+        HashMap<BusinessDataModel, Double> closest = new HashMap<>();
+        for (int i = 0; i < 3; i++) {
+            double minDistance = Double.MAX_VALUE;
+            int minIndex = 0;
+            for (int j = 0; j < distancesList.size(); j++) {
+                double distance = distancesList.get(j);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    minIndex = j;
+                }
+            }
+            Double distance = distancesList.get(minIndex);
+            BusinessDataModel closestBusiness = businessList.get(minIndex);
+            closest.put(closestBusiness, distance);
+            distancesList.remove(minIndex);
+            businessList.remove(minIndex);
+        }
+        return closest;
+    }
+}

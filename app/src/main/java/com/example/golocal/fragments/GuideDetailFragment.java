@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ public class GuideDetailFragment extends Fragment {
     private TextView tvAuthorDetail;
     private TextView tvDescriptionDetail;
     private RecyclerView rvBusinessesDetail;
+    private Button btRoute;
     private BusinessAdapter adapter;
     private FragmentManager fragmentManager;
 
@@ -53,6 +55,7 @@ public class GuideDetailFragment extends Fragment {
         tvTitleDetail = view.findViewById(R.id.tvTitleDetail);
         tvAuthorDetail = view.findViewById(R.id.tvAuthorDetail);
         tvDescriptionDetail = view.findViewById(R.id.tvDescriptionDetail);
+        btRoute = view.findViewById(R.id.btRoute);
         rvBusinessesDetail = view.findViewById(R.id.rvBusinessesDetail);
         adapter = new BusinessAdapter(getContext(), guideDataModel.getBusinessList());
 
@@ -72,83 +75,12 @@ public class GuideDetailFragment extends Fragment {
             }
         });
 
-        onRouteButton();
-    }
-
-    private void onRouteButton() {
-        List<BusinessDataModel> businessList = guideDataModel.getBusinessList();
-        BusinessGraph graph = new BusinessGraph();
-        for (BusinessDataModel business : businessList) {
-            String latitude = business.getLatitude();
-            String longitude = business.getLongitude();
-            ArrayList<Double> distancesList = new ArrayList<>();
-            for (BusinessDataModel visitBusiness : businessList) {
-                if (visitBusiness.hasSameId(business)) {
-                    continue;
-                } else {
-                    String visitLatitude = visitBusiness.getLatitude();
-                    String visitLongitude = visitBusiness.getLongitude();
-                    double distance = distanceBetweenPoints(latitude, longitude, visitLatitude, visitLongitude);
-                    distancesList.add(distance);
-                }
+        btRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RouteFragment routeFragment = new RouteFragment((ArrayList<BusinessDataModel>) guideDataModel.getBusinessList());
+                routeFragment.show(fragmentManager, "dialog");
             }
-            ArrayList<BusinessDataModel> businessListCopy = new ArrayList<>();
-            businessListCopy.addAll(businessList);
-            businessListCopy.remove(business);
-            HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosest(distancesList, businessListCopy);
-            BusinessNode currentBusinessNode = graph.getNodes().get(business);
-            if (currentBusinessNode == null) {
-                currentBusinessNode = new BusinessNode(business);
-            }
-            for (BusinessDataModel key : closestBusinesses.keySet()) {
-                Double distance = closestBusinesses.get(key);
-                currentBusinessNode.addAdjacentNode(key, distance);
-                BusinessNode neighborBusiness = graph.getNodes().get(key);
-                if (neighborBusiness == null) {
-                    neighborBusiness = new BusinessNode(key);
-                }
-                // this makes all the pointers "doubly linked" so that we guarantee every node is reachable
-                neighborBusiness.addAdjacentNode(business, distance);
-                graph.addNode(key, neighborBusiness);
-            }
-            graph.addNode(business, currentBusinessNode);
-        }
-        graph.dijkstra(graph.getNodes().get(businessList.get(0)));
-    }
-
-    private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
-        double lat1 = Math.toRadians(Double.parseDouble(latitude1));
-        double long1 = Math.toRadians(Double.parseDouble(longitude1));
-        double lat2 = Math.toRadians(Double.parseDouble(latitude2));
-        double long2 = Math.toRadians(Double.parseDouble(longitude2));
-
-        double longitudeDistance = long2 - long1;
-        double latitudeDistance = lat2 - lat1;
-        double step1 = Math.pow(Math.sin(latitudeDistance / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(longitudeDistance / 2),2);
-        double computation = 2 * Math.asin(Math.sqrt(step1));
-
-        double earthRadius = 3956;
-        return computation * earthRadius;
-    }
-
-    private HashMap<BusinessDataModel, Double> getThreeClosest(ArrayList<Double> distancesList, ArrayList<BusinessDataModel> businessList) {
-        HashMap<BusinessDataModel, Double> closest = new HashMap<>();
-        for (int i = 0; i < 3; i++) {
-            double minDistance = Double.MAX_VALUE;
-            int minIndex = 0;
-            for (int j = 0; j < distancesList.size(); j++) {
-                double distance = distancesList.get(j);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    minIndex = j;
-                }
-            }
-            Double distance = distancesList.get(minIndex);
-            BusinessDataModel closestBusiness = businessList.get(minIndex);
-            closest.put(closestBusiness, distance);
-            distancesList.remove(minIndex);
-            businessList.remove(minIndex);
-        }
-        return closest;
+        });
     }
 }
