@@ -148,6 +148,7 @@ public class RouteFragment extends DialogFragment {
             BusinessDataModel businessDataModel = node.getBusiness();
             routeBusinessNames.add(businessDataModel.getName());
         }
+        routeBusinessNames.add(endingBusiness.getName());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, routeBusinessNames);
         listViewPath.setAdapter(adapter);
     }
