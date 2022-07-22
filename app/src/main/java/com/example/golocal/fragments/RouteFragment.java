@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ public class RouteFragment extends DialogFragment {
     private AutoCompleteTextView startingBusiness;
     private AutoCompleteTextView endingBusiness;
     private ListView listViewPath;
+    private TextView tvSuggestedRoute;
     private BusinessDataModel start;
     private BusinessDataModel end;
 
@@ -66,6 +68,7 @@ public class RouteFragment extends DialogFragment {
         this.startingBusiness = view.findViewById(R.id.startingBusinessDropdown);
         this.endingBusiness = view.findViewById(R.id.endingBusinessDropdown);
         this.listViewPath = view.findViewById(R.id.listViewPath);
+        this.tvSuggestedRoute = view.findViewById(R.id.tvSuggestedRoute);
         ArrayList<String> businessNames = new ArrayList<>();
         for (BusinessDataModel business : businessList) {
             businessNames.add(business.getName());
@@ -152,6 +155,7 @@ public class RouteFragment extends DialogFragment {
         routeBusinessNames.add(endingBusiness.getName());
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, routeBusinessNames);
         listViewPath.setAdapter(adapter);
+        tvSuggestedRoute.setVisibility(View.VISIBLE);
     }
 
     private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
