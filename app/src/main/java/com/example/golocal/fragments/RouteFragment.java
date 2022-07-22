@@ -131,6 +131,7 @@ public class RouteFragment extends DialogFragment {
                 // this makes all the pointers "doubly linked" so that we guarantee every node is reachable
                 neighborBusiness.addAdjacentNode(business, distance);
                 graph.addNode(key, neighborBusiness);
+                Log.e("neighbor", business.getName() + " " + neighborBusiness.getBusiness().getName() + " " + distance);
             }
             graph.addNode(business, currentBusinessNode);
         }

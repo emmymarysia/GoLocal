@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,6 +71,7 @@ public class MapFragment extends Fragment {
         JSONObject jsonResults = null;
         try {
             jsonResults = new JSONObject(results);
+            Log.e("results", results);
             String name = jsonResults.getString("name");
             String address = jsonResults.getJSONObject("location").getString("address");
             Double latitude = Double.parseDouble(jsonResults.getJSONObject("geocodes").getJSONObject("main").getString("latitude"));
@@ -92,7 +94,7 @@ public class MapFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String businessFoursquareId = intent.getData().getLastPathSegment();
-            String requestUrl = PLACES_URL + businessFoursquareId + "?fields=description,photos";
+            String requestUrl = PLACES_URL + businessFoursquareId;
             call.execute(requestUrl, getString(R.string.foursquare_api_key));
         }
     }
@@ -229,9 +231,6 @@ public class MapFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        // set the results hashmap back in the mapFragment
-        // queryResultBusinesses.clear();
-        // queryResultBusinesses.putAll(this.queryResultBusinesses);
         return null;
     }
 
