@@ -2,6 +2,7 @@ package com.example.golocal.fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class RouteFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.fragment_route, container, false);
     }
 
     @NonNull
@@ -59,20 +60,25 @@ public class RouteFragment extends DialogFragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         this.btFindRoute = view.findViewById(R.id.btFindRoute);
-        this.startingBusiness = view.findViewById(R.id.tiStartingBusiness);
-        this.endingBusiness = view.findViewById(R.id.tiEndingBusiness);
+        this.startingBusiness = view.findViewById(R.id.startingBusinessDropdown);
+        this.endingBusiness = view.findViewById(R.id.endingBusinessDropdown);
         this.listViewPath = view.findViewById(R.id.listViewPath);
         ArrayList<String> businessNames = new ArrayList<>();
         for (BusinessDataModel business : businessList) {
             businessNames.add(business.getName());
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, businessNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, businessNames);
         startingBusiness.setAdapter(adapter);
         endingBusiness.setAdapter(adapter);
+        startingBusiness.setThreshold(1);
+        endingBusiness.setThreshold(1);
         startingBusiness.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("hello", "we are here");
                 start = businessList.get(position);
             }
         });
@@ -87,6 +93,9 @@ public class RouteFragment extends DialogFragment {
         btFindRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (start == null) {
+                    Log.e("hello?", "wtf");
+                }
                 onRouteButton(start, end);
             }
         });
@@ -115,6 +124,9 @@ public class RouteFragment extends DialogFragment {
             BusinessNode currentBusinessNode = graph.getNodes().get(business);
             if (currentBusinessNode == null) {
                 currentBusinessNode = new BusinessNode(business);
+                if (currentBusinessNode.getBusiness().getName().equals(startingBusiness.getName())) {
+                    Log.e("we did it!", "yay!");
+                }
             }
             for (BusinessDataModel key : closestBusinesses.keySet()) {
                 Double distance = closestBusinesses.get(key);
@@ -129,6 +141,7 @@ public class RouteFragment extends DialogFragment {
             }
             graph.addNode(business, currentBusinessNode);
         }
+        graph.getBusinesses();
         BusinessNode startingBusinessNode = graph.getNodes().get(startingBusiness);
         graph.dijkstra(startingBusinessNode);
         displayResults(graph, endingBusiness);
