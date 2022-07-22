@@ -52,7 +52,6 @@ public class CreateGuideFragment extends Fragment {
     private List<BusinessDataModel> businessDataModelList;
     private MainActivity mainActivity;
     private BusinessAdapter adapter;
-    private SearchAsyncCall call;
 
     public CreateGuideFragment(MainActivity main) {
         mainActivity = main;
@@ -69,7 +68,6 @@ public class CreateGuideFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Function<String, Void> postExecuteMethod = this::parseBusinessFromJson;
-        call = new SearchAsyncCall(postExecuteMethod);
         guideDataModel = new GuideDataModel();
         businessDataModelList = new ArrayList<>();
         etTitle = view.findViewById(R.id.etTitle);
@@ -96,6 +94,7 @@ public class CreateGuideFragment extends Fragment {
                     public void onClick(View v) {
                         String name = etName.getText().toString();
                         String userLocation = mainActivity.getLocation();
+                        SearchAsyncCall call = new SearchAsyncCall(postExecuteMethod);
                         call.execute(name, userLocation, getString(R.string.foursquare_api_key));
                         etName.setVisibility(View.GONE);
                         etBusinessDescription.setVisibility(View.GONE);

@@ -69,7 +69,12 @@ public class BusinessDataModel extends ParseObject {
     }
 
     public String getLatitude() {
-        return getString(KEY_LATITUDE);
+        try {
+            return fetchIfNeeded().getString(KEY_LATITUDE);
+        } catch (ParseException e) {
+            Log.e(TAG, "Couldn't get latitude", e);
+        }
+        return "";
     }
 
     public void setLongitude(String longitude) {

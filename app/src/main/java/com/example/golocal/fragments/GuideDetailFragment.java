@@ -14,10 +14,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.golocal.BusinessGraph;
+import com.example.golocal.BusinessNode;
 import com.example.golocal.R;
-import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.BusinessAdapter;
+import com.example.golocal.models.BusinessDataModel;
 import com.example.golocal.models.GuideDataModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class GuideDetailFragment extends Fragment {
 
@@ -65,5 +71,74 @@ public class GuideDetailFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
+
+        onRouteButton();
+    }
+
+    private void onRouteButton() {
+        List<BusinessDataModel> businessList = guideDataModel.getBusinessList();
+        BusinessGraph graph = new BusinessGraph();
+        for (BusinessDataModel business : businessList) {
+            String latitude = business.getLatitude();
+            String longitude = business.getLongitude();
+            ArrayList<Double> distancesList = new ArrayList<>();
+            for (BusinessDataModel visitBusiness : businessList) {
+                if (visitBusiness.hasSameId(business)) {
+                    continue;
+                } else {
+                    String visitLatitude = visitBusiness.getLatitude();
+                    String visitLongitude = visitBusiness.getLongitude();
+                    double distance = distanceBetweenPoints(latitude, longitude, visitLatitude, visitLongitude);
+                    distancesList.add(distance);
+                }
+            }
+            ArrayList<BusinessDataModel> businessListCopy = new ArrayList<>();
+            businessListCopy.addAll(businessList);
+            businessListCopy.remove(business);
+            HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosest(distancesList, businessListCopy);
+            BusinessNode currentBusinessNode = new BusinessNode();
+            for (BusinessDataModel key : closestBusinesses.keySet()) {
+                Double distance = closestBusinesses.get(key);
+                currentBusinessNode.addAdjacentNode(key, distance);
+            }
+            graph.addNode(business, currentBusinessNode);
+        }
+        graph.getBusinesses();
+    }
+
+    private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
+        double lat1 = Math.toRadians(Double.parseDouble(latitude1));
+        double long1 = Math.toRadians(Double.parseDouble(longitude1));
+        double lat2 = Math.toRadians(Double.parseDouble(latitude2));
+        double long2 = Math.toRadians(Double.parseDouble(longitude2));
+
+        double longitudeDistance = long2 - long1;
+        double latitudeDistance = lat2 - lat1;
+        double step1 = Math.pow(Math.sin(latitudeDistance / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(longitudeDistance / 2),2);
+        double computation = 2 * Math.asin(Math.sqrt(step1));
+
+        double earthRadius = 3956;
+        return computation * earthRadius;
+    }
+
+    private HashMap<BusinessDataModel, Double> getThreeClosest(ArrayList<Double> distancesList, ArrayList<BusinessDataModel> businessList) {
+        HashMap<BusinessDataModel, Double> closest = new HashMap<>();
+        for (int i = 0; i < 3; i++) {
+            double minDistance = Double.MAX_VALUE;
+            int minIndex = 0;
+            for (int j = 0; j < distancesList.size(); j++) {
+                double distance = distancesList.get(j);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    minIndex = j;
+                }
+            }
+            Double distance = distancesList.get(minIndex);
+            BusinessDataModel closestBusiness = businessList.get(minIndex);
+            closest.put(closestBusiness, distance);
+            distancesList.remove(minIndex);
+            businessList.remove(minIndex);
+        }
+        return closest;
     }
 }
