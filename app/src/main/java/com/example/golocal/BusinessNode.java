@@ -43,4 +43,8 @@ public class BusinessNode {
     public void clearShortestPath() {
         this.shortestPath.clear();
     }
+
+    public BusinessDataModel getBusiness() {
+        return this.business;
+    }
 }

@@ -9,11 +9,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.golocal.BusinessGraph;
@@ -31,6 +31,7 @@ public class RouteFragment extends DialogFragment {
     private Button btFindRoute;
     private AutoCompleteTextView startingBusiness;
     private AutoCompleteTextView endingBusiness;
+    private ListView listViewPath;
     private BusinessDataModel start;
     private BusinessDataModel end;
 
@@ -61,6 +62,7 @@ public class RouteFragment extends DialogFragment {
         this.btFindRoute = view.findViewById(R.id.btFindRoute);
         this.startingBusiness = view.findViewById(R.id.tiStartingBusiness);
         this.endingBusiness = view.findViewById(R.id.tiEndingBusiness);
+        this.listViewPath = view.findViewById(R.id.listViewPath);
         ArrayList<String> businessNames = new ArrayList<>();
         for (BusinessDataModel business : businessList) {
             businessNames.add(business.getName());
@@ -109,7 +111,7 @@ public class RouteFragment extends DialogFragment {
             ArrayList<BusinessDataModel> businessListCopy = new ArrayList<>();
             businessListCopy.addAll(businessList);
             businessListCopy.remove(business);
-            HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosest(distancesList, businessListCopy);
+            HashMap<BusinessDataModel, Double> closestBusinesses = getThreeClosestBusinesses(distancesList, businessListCopy);
             BusinessNode currentBusinessNode = graph.getNodes().get(business);
             if (currentBusinessNode == null) {
                 currentBusinessNode = new BusinessNode(business);
@@ -129,6 +131,19 @@ public class RouteFragment extends DialogFragment {
         }
         BusinessNode startingBusinessNode = graph.getNodes().get(startingBusiness);
         graph.dijkstra(startingBusinessNode);
+        displayResults(graph, endingBusiness);
+    }
+
+    private void displayResults(BusinessGraph graph, BusinessDataModel endingBusiness) {
+        BusinessNode endingBusinessNode = graph.getNodes().get(endingBusiness);
+        List<BusinessNode> shortestPath = endingBusinessNode.getShortestPath();
+        ArrayList<String> routeBusinessNames = new ArrayList<>();
+        for (BusinessNode node : shortestPath) {
+            BusinessDataModel businessDataModel = node.getBusiness();
+            routeBusinessNames.add(businessDataModel.getName());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, routeBusinessNames);
+        listViewPath.setAdapter(adapter);
     }
 
     private double distanceBetweenPoints(String latitude1, String longitude1, String latitude2, String longitude2) {
@@ -146,7 +161,7 @@ public class RouteFragment extends DialogFragment {
         return computation * earthRadius;
     }
 
-    private HashMap<BusinessDataModel, Double> getThreeClosest(ArrayList<Double> distancesList, ArrayList<BusinessDataModel> businessList) {
+    private HashMap<BusinessDataModel, Double> getThreeClosestBusinesses(ArrayList<Double> distancesList, ArrayList<BusinessDataModel> businessList) {
         HashMap<BusinessDataModel, Double> closest = new HashMap<>();
         for (int i = 0; i < 3; i++) {
             double minDistance = Double.MAX_VALUE;
