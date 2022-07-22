@@ -78,7 +78,6 @@ public class RouteFragment extends DialogFragment {
         startingBusiness.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.e("hello", "we are here");
                 start = businessList.get(position);
             }
         });
@@ -93,9 +92,6 @@ public class RouteFragment extends DialogFragment {
         btFindRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (start == null) {
-                    Log.e("hello?", "wtf");
-                }
                 onRouteButton(start, end);
             }
         });
@@ -124,9 +120,6 @@ public class RouteFragment extends DialogFragment {
             BusinessNode currentBusinessNode = graph.getNodes().get(business);
             if (currentBusinessNode == null) {
                 currentBusinessNode = new BusinessNode(business);
-                if (currentBusinessNode.getBusiness().getName().equals(startingBusiness.getName())) {
-                    Log.e("we did it!", "yay!");
-                }
             }
             for (BusinessDataModel key : closestBusinesses.keySet()) {
                 Double distance = closestBusinesses.get(key);
