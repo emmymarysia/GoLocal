@@ -49,6 +49,9 @@ public class BusinessAdapter extends RecyclerView.Adapter<BusinessAdapter.ViewHo
 
     @Override
     public int getItemCount() {
+        if (businessDataModelList == null) {
+            return 0;
+        }
         return businessDataModelList.size();
     }
 
