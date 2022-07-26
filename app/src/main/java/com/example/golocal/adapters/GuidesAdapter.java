@@ -97,8 +97,10 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             ParseUser currentUser = ParseUser.getCurrentUser();
             List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
             ArrayList<String> likedGuideIds = new ArrayList<>();
-            for (GuideDataModel guide : likedGuides) {
-                likedGuideIds.add(guide.getObjectId());
+            if (likedGuides != null) {
+                for (GuideDataModel guide : likedGuides) {
+                    likedGuideIds.add(guide.getObjectId());
+                }
             }
             if (likedGuides != null && likedGuideIds.contains(guideDataModel.getObjectId())) {
                 ivGuideFavorited.setImageResource(android.R.drawable.btn_star_big_on);
