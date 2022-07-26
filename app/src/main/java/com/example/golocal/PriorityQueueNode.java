@@ -31,15 +31,17 @@ public class PriorityQueueNode {
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userLocation = currentUser.getString(KEY_LOCATION);
         List<ParseUser> friends = currentUser.getList(KEY_FRIENDS);
-        for (ParseUser friend: friends) {
-            String friendUsername = "";
-            try {
-                friendUsername = friend.fetchIfNeeded().getString("username");
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if (guideAuthorUsername.equals(friendUsername)) {
-                priority += 2;
+        if (friends != null) {
+            for (ParseUser friend: friends) {
+                String friendUsername = "";
+                try {
+                    friendUsername = friend.fetchIfNeeded().getString("username");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (guideAuthorUsername.equals(friendUsername)) {
+                    priority += 2;
+                }
             }
         }
         if (userLocation.equals(guideLocation)) {

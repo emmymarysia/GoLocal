@@ -2,10 +2,12 @@ package com.example.golocal.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,6 +27,8 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder> {
@@ -60,50 +64,6 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull GuidesAdapter.ViewHolder holder, int position) {
         GuideDataModel guideDataModel = addedGuides.get(position);
         holder.bind(guideDataModel);
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                new MaterialAlertDialogBuilder(v.getContext())
-                        .setTitle(guideDataModel.getTitle())
-                        .setMessage(guideDataModel.getDescription())
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setPositiveButton("Favorite Guide", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                ParseUser currentUser = ParseUser.getCurrentUser();
-                                List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
-                                if (likedGuides == null) {
-                                    likedGuides = new ArrayList<>();
-                                }
-                                boolean guideIsAlreadyLiked = false;
-                                for (GuideDataModel guide: likedGuides) {
-                                    if (guide.hasSameId(guideDataModel)) {
-                                        guideIsAlreadyLiked = true;
-                                    }
-                                }
-                                if (!guideIsAlreadyLiked) {
-                                    likedGuides.add(guideDataModel);
-                                }
-                                currentUser.put(KEY_LIKED_GUIDES, likedGuides);
-                                currentUser.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e != null) {
-                                            Log.e(TAG, "Error saving user", e);
-                                        }
-                                    }
-                                });
-                            }
-                        })
-                        .show();
-                return false;
-            }
-        });
     }
 
     @Override
@@ -121,12 +81,14 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
         private TextView tvTitle;
         private TextView tvAuthor;
         private TextView tvDescription;
+        private ImageView ivGuideFavorited;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvAuthor = itemView.findViewById(R.id.tvAuthor);
             tvDescription = itemView.findViewById(R.id.tvDescription);
+            ivGuideFavorited = itemView.findViewById(R.id.ivGuideFavorited);
             itemView.setOnClickListener(this);
         }
 
@@ -134,6 +96,60 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             tvTitle.setText(guideDataModel.getTitle());
             tvAuthor.setText(guideDataModel.getAuthor().getUsername());
             tvDescription.setText(guideDataModel.getDescription());
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
+            ArrayList<String> likedGuideIds = new ArrayList<>();
+            if (likedGuides != null) {
+                for (GuideDataModel guide : likedGuides) {
+                    likedGuideIds.add(guide.getObjectId());
+                }
+            }
+            if (likedGuides != null && likedGuideIds.contains(guideDataModel.getObjectId())) {
+                ivGuideFavorited.setImageResource(android.R.drawable.btn_star_big_on);
+            } else {
+                ivGuideFavorited.setImageResource(android.R.drawable.btn_star_big_off);
+            }
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    new MaterialAlertDialogBuilder(v.getContext())
+                            .setTitle(guideDataModel.getTitle())
+                            .setMessage(guideDataModel.getDescription())
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setPositiveButton("Favorite Guide", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    ivGuideFavorited.setImageResource(android.R.drawable.btn_star_big_on);
+                                    ParseUser currentUser = ParseUser.getCurrentUser();
+                                    List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
+                                    HashMap<String, GuideDataModel> likedGuidesIds = new HashMap<>();
+                                    for (GuideDataModel guide : likedGuides) {
+                                        likedGuidesIds.put(guide.getObjectId(), guide);
+                                    }
+                                    likedGuidesIds.put(guideDataModel.getObjectId(), guideDataModel);
+                                    likedGuides.clear();
+                                    likedGuides.addAll(likedGuidesIds.values());
+                                    currentUser.put(KEY_LIKED_GUIDES, likedGuides);
+                                    currentUser.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e != null) {
+                                                Log.e(TAG, "Error saving user", e);
+                                            }
+                                        }
+                                    });
+                                }
+                            })
+                            .show();
+                    return false;
+                }
+            });
         }
 
         @Override
