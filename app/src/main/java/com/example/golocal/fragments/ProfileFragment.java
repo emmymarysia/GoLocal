@@ -33,11 +33,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.golocal.R;
 import com.example.golocal.activities.LoginActivity;
+import com.example.golocal.adapters.GuidesAdapter;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -72,6 +74,7 @@ public class ProfileFragment extends Fragment {
     private ImageButton ibEditProfileImage;
     private ImageButton ibAddFriend;
     private ImageButton ibRemoveFriend;
+    private RecyclerView rvUserGuides;
     private ParseUser user;
     private Context context;
     private File photoFile;
@@ -128,6 +131,9 @@ public class ProfileFragment extends Fragment {
         ibEditProfileImage = view.findViewById(R.id.ibEditProfileImage);
         ibAddFriend = view.findViewById(R.id.ibAddFriend);
         ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
+        rvUserGuides = view.findViewById(R.id.rvUserGuides);
+
+        // GuidesAdapter adapter = new GuidesAdapter();
 
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
 

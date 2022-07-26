@@ -27,6 +27,8 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder> {
@@ -126,18 +128,13 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
                                     ivGuideFavorited.setImageResource(android.R.drawable.btn_star_big_on);
                                     ParseUser currentUser = ParseUser.getCurrentUser();
                                     List<GuideDataModel> likedGuides = currentUser.getList(KEY_LIKED_GUIDES);
-                                    if (likedGuides == null) {
-                                        likedGuides = new ArrayList<>();
+                                    HashMap<String, GuideDataModel> likedGuidesIds = new HashMap<>();
+                                    for (GuideDataModel guide : likedGuides) {
+                                        likedGuidesIds.put(guide.getObjectId(), guide);
                                     }
-                                    boolean guideIsAlreadyLiked = false;
-                                    for (GuideDataModel guide: likedGuides) {
-                                        if (guide.hasSameId(guideDataModel)) {
-                                            guideIsAlreadyLiked = true;
-                                        }
-                                    }
-                                    if (!guideIsAlreadyLiked) {
-                                        likedGuides.add(guideDataModel);
-                                    }
+                                    likedGuidesIds.put(guideDataModel.getObjectId(), guideDataModel);
+                                    likedGuides.clear();
+                                    likedGuides.addAll(likedGuidesIds.values());
                                     currentUser.put(KEY_LIKED_GUIDES, likedGuides);
                                     currentUser.saveInBackground(new SaveCallback() {
                                         @Override
