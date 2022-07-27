@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.action_profile:
                         if (profileFragment == null) {
-                            profileFragment = new ProfileFragment(ParseUser.getCurrentUser());
+                            profileFragment = new ProfileFragment(ParseUser.getCurrentUser(), MainActivity.this);
                         }
                         fragment = profileFragment;
                         break;

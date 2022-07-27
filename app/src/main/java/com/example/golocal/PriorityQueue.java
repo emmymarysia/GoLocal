@@ -1,6 +1,9 @@
 package com.example.golocal;
 
+import android.util.Log;
+
 import com.example.golocal.models.GuideDataModel;
+import com.parse.ParseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +153,10 @@ public class PriorityQueue {
         return guides;
     }
 
-    public void insertAllGuides(List<GuideDataModel> guidesList) {
+    public void insertAllGuides(List<GuideDataModel> guidesList) throws ParseException {
+        if (guidesList == null) {
+            return;
+        }
         for (GuideDataModel guide: guidesList) {
             PriorityQueueNode currentGuide = new PriorityQueueNode(guide);
             insert(currentGuide);

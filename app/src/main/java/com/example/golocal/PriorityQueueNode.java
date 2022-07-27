@@ -16,17 +16,17 @@ public class PriorityQueueNode {
     private final String KEY_LOCATION = "location";
     private final String KEY_FRIENDS = "friends";
 
-    public PriorityQueueNode(GuideDataModel guideDataModel) {
+    public PriorityQueueNode(GuideDataModel guideDataModel) throws ParseException {
         this.guideDataModel = guideDataModel;
         assignPriority();
     }
 
-    private void assignPriority() {
+    private void assignPriority() throws ParseException {
         // TODO: add guide creation to the priority function
         this.priority = 0;
         String guideLocation = this.guideDataModel.getLocation();
         ParseUser guideAuthor = this.guideDataModel.getAuthor();
-        String guideAuthorUsername = guideAuthor.getUsername();
+        String guideAuthorUsername = guideAuthor.fetchIfNeeded().getUsername();
         Date createdAt = this.guideDataModel.getCreatedAt();
         ParseUser currentUser = ParseUser.getCurrentUser();
         String userLocation = currentUser.getString(KEY_LOCATION);

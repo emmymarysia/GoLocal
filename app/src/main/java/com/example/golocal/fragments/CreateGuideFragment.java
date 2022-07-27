@@ -23,6 +23,7 @@ import com.example.golocal.models.BusinessDataModel;
 import com.example.golocal.models.GuideDataModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -38,7 +39,6 @@ import java.util.function.Function;
 public class CreateGuideFragment extends Fragment {
 
     private final String TAG = "CreateGuideFragment";
-    private final String PLACES_SEARCH_URL = "https://api.foursquare.com/v3/places/search";
 
     private EditText etTitle;
     private EditText etDescription;
@@ -123,10 +123,28 @@ public class CreateGuideFragment extends Fragment {
                         mainActivity.guidesFragment.adapter.clear();
                     }
                 });
-
                 Fragment fragment = mainActivity.guidesFragment;
                 mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                List<GuideDataModel> publishedGuides = currentUser.getList("publishedGuides");
+                if (publishedGuides == null) {
+                    Log.e("here", "here");
+                    publishedGuides = new ArrayList<>();
+                }
+                publishedGuides.add(guideDataModel);
+                ParseACL acl = new ParseACL();
+                acl.setReadAccess(currentUser,true);
+                acl.setWriteAccess(currentUser,true);
+                currentUser.setACL(acl);
+                currentUser.put("publishedGuides", publishedGuides);
+                currentUser.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error saving user", e);
+                        }
+                    }
+                });
             }
         });
     }

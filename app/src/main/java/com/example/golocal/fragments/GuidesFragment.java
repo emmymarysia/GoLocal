@@ -91,7 +91,11 @@ public class GuidesFragment extends Fragment {
                     return;
                 }
                 adapter.clear();
-                guidesPriorityQueue.insertAllGuides(guidesList);
+                try {
+                    guidesPriorityQueue.insertAllGuides(guidesList);
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                }
 
                 ArrayList<GuideDataModel> guidesInPriorityOrder = new ArrayList<>();
                 guidesInPriorityOrder.addAll(guidesPriorityQueue.getAllGuidesInOrder());
