@@ -33,13 +33,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
+import com.example.golocal.PriorityQueue;
 import com.example.golocal.R;
 import com.example.golocal.activities.LoginActivity;
+import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.GuidesAdapter;
+import com.example.golocal.models.GuideDataModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -79,9 +83,11 @@ public class ProfileFragment extends Fragment {
     private Context context;
     private File photoFile;
     private HashSet<String> friendIds = new HashSet<>();
+    private MainActivity mainActivity;
 
-    public ProfileFragment(ParseUser currentUser) {
+    public ProfileFragment(ParseUser currentUser, MainActivity mainActivity) {
         user = currentUser;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -133,7 +139,18 @@ public class ProfileFragment extends Fragment {
         ibRemoveFriend = view.findViewById(R.id.ibRemoveFriend);
         rvUserGuides = view.findViewById(R.id.rvUserGuides);
 
-        // GuidesAdapter adapter = new GuidesAdapter();
+        PriorityQueue queue = new PriorityQueue();
+        List<GuideDataModel> userCreatedGuides = user.getList("publishedGuides");
+        try {
+            queue.insertAllGuides(userCreatedGuides);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        GuidesAdapter adapter = new GuidesAdapter(context, queue, mainActivity);
+        rvUserGuides.setAdapter(adapter);
+        rvUserGuides.setLayoutManager(new LinearLayoutManager(context));
+        adapter.addAll((ArrayList<GuideDataModel>) userCreatedGuides);
+        adapter.notifyDataSetChanged();
 
         shortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
 

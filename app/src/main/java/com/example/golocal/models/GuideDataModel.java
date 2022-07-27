@@ -2,6 +2,7 @@ package com.example.golocal.models;
 
 import com.example.golocal.models.BusinessDataModel;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -59,8 +60,8 @@ public class GuideDataModel extends ParseObject {
         put(KEY_DESCRIPTION, description);
     }
 
-    public String getLocation() {
-        return getString(KEY_DESCRIPTION);
+    public String getLocation() throws ParseException {
+        return fetchIfNeeded().getString(KEY_DESCRIPTION);
     }
 
     public void setLocation(String location) {

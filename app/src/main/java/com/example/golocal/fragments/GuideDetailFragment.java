@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.golocal.BusinessGraph;
 import com.example.golocal.BusinessNode;
 import com.example.golocal.R;
+import com.example.golocal.activities.MainActivity;
 import com.example.golocal.adapters.BusinessAdapter;
 import com.example.golocal.models.BusinessDataModel;
 import com.example.golocal.models.GuideDataModel;
@@ -36,10 +37,12 @@ public class GuideDetailFragment extends Fragment {
     private Button btRoute;
     private BusinessAdapter adapter;
     private FragmentManager fragmentManager;
+    private MainActivity mainActivity;
 
-    public GuideDetailFragment(GuideDataModel guideDataModel, FragmentManager fragmentManager) {
+    public GuideDetailFragment(GuideDataModel guideDataModel, FragmentManager fragmentManager, MainActivity mainActivity) {
         this.guideDataModel = guideDataModel;
         this.fragmentManager = fragmentManager;
+        this.mainActivity = mainActivity;
     }
 
     @Nullable
@@ -68,7 +71,7 @@ public class GuideDetailFragment extends Fragment {
         tvAuthorDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileFragment profileFragment = new ProfileFragment(guideDataModel.getAuthor());
+                ProfileFragment profileFragment = new ProfileFragment(guideDataModel.getAuthor(), mainActivity);
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.flContainer, profileFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();

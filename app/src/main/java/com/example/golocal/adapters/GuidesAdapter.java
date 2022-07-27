@@ -157,7 +157,7 @@ public class GuidesAdapter extends RecyclerView.Adapter<GuidesAdapter.ViewHolder
             int position = getAdapterPosition();
             if (position != RecyclerView.NO_POSITION) {
                 GuideDataModel guideDataModel = addedGuides.get(position);
-                Fragment fragment = new GuideDetailFragment(guideDataModel, mainActivity.fragmentManager);
+                Fragment fragment = new GuideDetailFragment(guideDataModel, mainActivity.fragmentManager, mainActivity);
                 FragmentTransaction fragmentTransaction = mainActivity.fragmentManager.beginTransaction().replace(R.id.flContainer, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
